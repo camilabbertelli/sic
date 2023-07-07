@@ -1,0 +1,1 @@
+g++ teste.cpp utils.cpp -o app `pkg-config --cflags --libs opencv4`

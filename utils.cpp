@@ -15,7 +15,6 @@ bool camicasa::screenThresholdDetection(Mat &frame, int operation /*CHECK_SMALLE
     int avg = (mean(0) + mean(1) + mean(2)) / 3;
     if (operation){
 
-        cout << "Avg in screen: " << avg << " Threshold: " << threshold << "\n";
         return (avg < threshold);
     }
 
@@ -41,14 +40,11 @@ void camicasa::hasSaturatedCorners(Mat &frame, vector<Point> corners, vector<int
     Mat topRight = frame(Range(0, corners.at(1).y), Range(frameWidth - corners.at(1).x, frameWidth));
     Mat bottomLeft = frame(Range(frameHeight - corners.at(2).y, frameHeight), Range(0, corners.at(2).x));
     Mat bottomRight = frame(Range(0, corners.at(3).y), Range(frameWidth - corners.at(3).x, frameWidth));
-    puts("Checking saturation...");
 
-    frameStillCount[0] = (screenThresholdDetection(topLeft, operation, threshold)) ? frameStillCount[0] + 1 : 0;
-    frameStillCount[1] = (screenThresholdDetection(topRight, operation, threshold)) ? frameStillCount[1] + 1 : 0;
-    frameStillCount[2] = (screenThresholdDetection(bottomLeft, operation, threshold)) ? frameStillCount[2] + 1 : 0;
-    frameStillCount[3] = (screenThresholdDetection(bottomRight, operation, threshold)) ? frameStillCount[3] + 1 : 0;
-
-    cout << "Frame still for " << frameStillCount << "\n";
+    frameStillCount[0] = (screenThresholdDetection(topLeft, operation, threshold)) ? 0 : frameStillCount[0] + 1;
+    frameStillCount[1] = (screenThresholdDetection(topRight, operation, threshold)) ? 0 : frameStillCount[1] + 1;
+    frameStillCount[2] = (screenThresholdDetection(bottomLeft, operation, threshold)) ? 0 : frameStillCount[2] + 1;
+    frameStillCount[3] = (screenThresholdDetection(bottomRight, operation, threshold)) ? 0 : frameStillCount[3] + 1;
 }
 
 /**
@@ -103,4 +99,15 @@ vector<Point> camicasa::getCornersScreen(int frameWidth, int frameHeight)
     vec.push_back(Point(w, z));
 
     return vec;
+}
+
+/**
+    @brief The functions camicasa::cropLogo is a method for finding the logo present and cropping the input frame
+    @param[in] inputOriginal original image frame input cv::Mat
+    @param[in] inputCompared compared image frame with bitwise_and operation input cv::Mat
+    @param[out] output image frame output cv::Mat with only the logo
+ */
+void camicasa::cropLogo(Mat& inputOriginal, Mat& inputCompared, Mat& output){
+    // TODO: get only the part that matters
+    output = inputOriginal.clone();
 }

@@ -1,5 +1,9 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <bits/stdc++.h>
+#include <iostream>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <vector>
 #include "utils.hpp"
 
@@ -35,6 +39,10 @@ int main(int argc, char** argv)
     cout << "Frame height: " << frameHeight << "\n";
     cout << "FPS: " << fps << "\n";
 
+    //system("rm -r videos");
+    system("rm -r logos");
+    mkdir("videos", 0777);
+    mkdir("logos", 0777);
 
     // variables used to control states
 
@@ -46,18 +54,25 @@ int main(int argc, char** argv)
     Mat frame;
     int timestamp;
 
+    Mat currentFrame;
+    Mat previousFrame;
+    Mat operationCompare;
+    int logoCount = 1;
+    bool logoFound = false;
+    bool stillLogo = false;
+
+    vector<Point> corners = getCornersScreen(frameWidth, frameHeight);
+    vector<int> frameStillCount = {0, 0, 0, 0};
+
     list<segment> segments;
 
     // Initialize writer object
     stringstream videoName;
     videoName << "videos/segment" << currentSegment.id << ".mp4";
 	VideoWriter writer;
-    writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
+    //writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
     
     while (vidCapture.isOpened()){
-        // TODO: detect all black frames
-        // TODO: detect sic logo to classify news/program vs ads
-        // TODO: time all that and write in txt file/stdout
 
         vidCapture >> frame;
         if(frame.empty())
@@ -74,7 +89,6 @@ int main(int argc, char** argv)
 
         timestamp = vidCapture.get(CAP_PROP_POS_MSEC);
         
-
         if (!alreadyBlack && screenThresholdDetection(frame)){
             
             if (startSegment){
@@ -86,7 +100,7 @@ int main(int argc, char** argv)
                 videoName.str(std::string());
                 videoName << "videos/segment" << ++currentSegment.id << ".mp4";
                
-                writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
+                //writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
                 
                 startSegment = false;
             }
@@ -97,11 +111,68 @@ int main(int argc, char** argv)
             alreadyBlack = false;
             startSegment = true;
             currentSegment.startTimestamp = timestamp;
-        } else
+        } else{
             startSegment = true;
+            if (previousFrame.empty()){
+                currentFrame = frame.clone();
+
+                previousFrame = currentFrame.clone();
+                operationCompare = previousFrame.clone();
+                continue;
+            }
+
+            previousFrame = currentFrame.clone();
+            currentFrame = frame.clone();
+
+            bitwise_and(operationCompare, currentFrame, operationCompare);
+
+            hasSaturatedCorners(operationCompare, corners, frameStillCount, frameWidth, frameHeight, CHECK_SMALLER, 5);
+            
+            stringstream logoName;
+            logoName.str("");
+            Mat croppedOriginal;
+            Mat croppedCompare;
+            
+            if (!stillLogo && frameStillCount[0] > fps*20){
+                logoFound = true;
+                croppedOriginal = frame(Range(0, corners.at(0).y), Range(0, corners.at(0).x));
+                croppedCompare = operationCompare(Range(0, corners.at(0).y), Range(0, corners.at(0).x));
+                puts("Found potential logo top left!");
+            } else if (!logoFound && frameStillCount[1] > fps*20){
+                logoFound = true;
+                croppedOriginal = frame(Range(0, corners.at(1).y), Range(frameWidth - corners.at(1).x, frameWidth));
+                croppedCompare = operationCompare(Range(0, corners.at(1).y), Range(frameWidth - corners.at(1).x, frameWidth));
+                puts("Found potential logo top right!");
+            } else if (!logoFound && frameStillCount[2] > fps*20){
+                logoFound = true;
+                croppedOriginal = frame(Range(frameHeight - corners.at(2).y, frameHeight), Range(0, corners.at(2).x));
+                croppedCompare = operationCompare(Range(frameHeight - corners.at(2).y, frameHeight), Range(0, corners.at(2).x));
+                puts("Found potential logo bottom left!");
+            } else if (!logoFound && frameStillCount[3] > fps*20){
+                logoFound = true;
+                croppedOriginal = frame(Range(frameHeight - corners.at(3).y, frameHeight), Range(frameWidth - corners.at(3).x, frameWidth));
+                croppedCompare = operationCompare(Range(frameHeight - corners.at(3).y, frameHeight), Range(frameWidth - corners.at(3).x, frameWidth));
+                puts("Found potential logo bottom right!");
+            }
+
+            if (logoFound){
+                logoFound = false;
+                stillLogo = true;
+                logoName << "logos/logo" << logoCount++ << ".jpg"; 
+                
+                Mat logo;
+                cropLogo(croppedOriginal, croppedCompare, logo);
+                imwrite(logoName.str(), logo);
+            }
+
+            if ((sum(frameStillCount))(0) == 0){
+                operationCompare = previousFrame;
+                stillLogo = false;
+            }
+        }
         
-        if (startSegment)
-            writer.write(frame);
+        /*if (startSegment)
+            writer.write(frame);*/
 
         /*imshow("Frame", frame);
 

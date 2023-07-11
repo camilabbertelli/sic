@@ -19,7 +19,7 @@ namespace camicasa
     vector<Point> getCornersScreen(int frameWidth, int frameHeight);
     void convertBinarizedFrame(Mat& frame, Mat& output, int mode = IMPORTANT_IN_WHITE);
     void cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output);
-    void openingMorphOperation(Mat& input, Mat& output);
+    void morphOperation(Mat& input, Mat& output);
 }
 
 #endif

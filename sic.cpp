@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     cout << "Frame height: " << frameHeight << "\n";
     cout << "FPS: " << fps << "\n";
 
-    //system("rm -r videos");
+    system("rm -r videos");
     system("rm -r logos");
     mkdir("videos", 0777);
     mkdir("logos", 0777);
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
     stringstream videoName;
     videoName << "videos/segment" << currentSegment.id << ".mp4";
 	VideoWriter writer;
-    //writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
+    writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
     
     while (vidCapture.isOpened()){
 
@@ -100,24 +100,29 @@ int main(int argc, char** argv)
                 videoName.str(std::string());
                 videoName << "videos/segment" << ++currentSegment.id << ".mp4";
                
-                //writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
+                writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
                 
                 startSegment = false;
             }
 
             alreadyBlack = true;
         } else if (alreadyBlack && !screenThresholdDetection(frame)){
-            cout << "\nStart of segment " << currentSegment.id << " at " << formatTimestamp(timestamp) << "\n";
+            if (!startSegment){
+                cout << "\nStart of segment " << currentSegment.id << " at " << formatTimestamp(timestamp) << "\n";
+                startSegment = true;
+                currentSegment.startTimestamp = timestamp;
+            }
             alreadyBlack = false;
-            startSegment = true;
-            currentSegment.startTimestamp = timestamp;
         } else{
-            startSegment = true;
+            if (!startSegment){
+                cout << "\nStart of segment " << currentSegment.id << " at " << formatTimestamp(timestamp) << "\n";
+                startSegment = true;
+                currentSegment.startTimestamp = timestamp;
+            }
 
             int frameNumber = vidCapture.get(CAP_PROP_POS_FRAMES);
 
-            if (frameNumber % fps != 0)
-                continue;
+            if (frameNumber % fps == 0){
 
             if (previousFrame.empty()){
                 currentFrame = frame.clone();
@@ -139,7 +144,7 @@ int main(int argc, char** argv)
             Mat croppedOriginal;
             Mat croppedCompare;
 
-            int minimumTime = 70;
+            int minimumTime = 120;
             
             if (!stillLogo && frameStillCount[0] > minimumTime){
                 logoFound = true;
@@ -173,18 +178,19 @@ int main(int argc, char** argv)
                 
                 imwrite(logoName.str(), logo);
 
-                imwrite("logos/croppedCompare.jpg", croppedCompare);
-                imwrite("logos/croppedOriginal.jpg", croppedOriginal);
+                //imwrite("logos/croppedCompare.jpg", croppedCompare);
+                //imwrite("logos/croppedOriginal.jpg", croppedOriginal);
             }
 
             if ((sum(frameStillCount))(0) == 0){
                 operationCompare = previousFrame;
                 stillLogo = false;
             }
+            }
         }
         
-        //if (startSegment)
-        //  writer.write(frame);
+        if (startSegment)
+          writer.write(frame);
 
         /*imshow("Frame", frame);
 

@@ -14,12 +14,11 @@ int main(int argc, char** argv)
     Mat croppedCompare;
     Mat logo;
 
-    croppedOriginal = imread("logos/croppedOriginal.jpg");
-    croppedCompare = imread("logos/croppedCompare.jpg");
+    croppedOriginal = imread("testeLogo/croppedOriginal.jpg");
+    croppedCompare = imread("testeLogo/croppedCompare.jpg");
 
     cropLogo(croppedOriginal, croppedCompare, logo);
 
-    imshow("Original", croppedOriginal);
     imshow("Compared", croppedCompare);
     imshow("Final logo", logo);
 

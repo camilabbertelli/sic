@@ -130,7 +130,6 @@ void camicasa::convertBinarizedFrame(Mat& input, Mat& output, int mode){
 void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
     Mat bitwise;
     bitwise_and(inputOriginal, inputBitwise, bitwise);
-    imshow("Bitwise", bitwise);
 
     Mat bitwise_gray;
     cvtColor(bitwise, bitwise_gray, COLOR_BGR2GRAY);
@@ -141,8 +140,7 @@ void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
     imshow("Otsu", otsuThresh);
 
     Mat opening;
-    //openingMorphOperation(otsuThresh, opening);
-
+    morphOperation(otsuThresh, otsuThresh);
 
     int startX = 0;
     int startY = 0;
@@ -153,6 +151,8 @@ void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
 
     bool foundStartX = false;
     bool foundStartY = false;
+
+    vector<vector<Point>> possibleSquares;
 
     for (int row = 0; row < inputOriginal.rows; row++){
         for (int column = 0; column < inputOriginal.cols; column++){
@@ -175,7 +175,7 @@ void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
                 foundStartX = true;
             }
 
-            if (foundStartX && value){
+            if (foundStartX && value && column >= endX){
                 endX = column;
             }
 
@@ -184,7 +184,7 @@ void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
                 foundStartY = true;
             }
 
-            if (foundStartY && value){
+            if (foundStartY && value && row >= endY){
                 endY = row;
             }
         }
@@ -199,19 +199,33 @@ void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
     output = inputOriginal(Range(startY, endY), Range(startX, endX));
 }
 
-void camicasa::openingMorphOperation(Mat& input, Mat& output){
+
+/**
+    @brief The functions camicasa::morphOperation is a method for removing dots and loose pixels in the input frame
+    utilizing the cv::morphologyEx function
+    @param[in] input image frame input cv::Mat
+    @param[out] output image frame output cv::Mat
+ */
+void camicasa::morphOperation(Mat& input, Mat& output){
     // Create a structuring element
-    int morph_size = 2;
-    Mat element = getStructuringElement(
-        MORPH_ELLIPSE,
+    int morph_size = 1;
+    Mat element1 = getStructuringElement(
+        MORPH_CROSS,
+        Size(2 * morph_size + 1,
+             2 * morph_size + 1));
+
+    morph_size = 2;
+    Mat element2 = getStructuringElement(
+        MORPH_RECT,
         Size(2 * morph_size + 1,
              2 * morph_size + 1));
   
-    // Opening
-    morphologyEx(input, output,
-                 MORPH_OPEN, element);
-  
+    // Transformations
+    Mat aux;
+    erode(input, aux, element1);
+    dilate(aux, output, element2);
+
     // Display the image
-    imshow("source", input);
-    imshow("Opening", output);
+    imshow("Aux", aux);
+    imshow("Output", output);
 }

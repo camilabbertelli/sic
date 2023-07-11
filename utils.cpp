@@ -3,7 +3,7 @@
 using namespace camicasa;
 
 /**
-    @brief The function camicasa::screenThresholdDetection is a method for detecting if the average of pixels falls under/above a certain threshold
+    @brief The function camicasa::screenThresholdDetection is a method for detecting if the average of pixels(BGR) falls under/above a certain threshold
     @param frame image frame input cv::Mat
     @param operation defines which comparison to execute (camicasa::CHECK_SMALLER, camicasa::CHECK_BIGGER)
     @param threshold optional threshold to compare
@@ -13,10 +13,8 @@ bool camicasa::screenThresholdDetection(Mat &frame, int operation /*CHECK_SMALLE
 {
     Scalar mean = cv::mean(frame);
     int avg = (mean(0) + mean(1) + mean(2)) / 3;
-    if (operation){
-
+    if (operation)
         return (avg < threshold);
-    }
 
     return (avg > threshold);
 }
@@ -101,13 +99,119 @@ vector<Point> camicasa::getCornersScreen(int frameWidth, int frameHeight)
     return vec;
 }
 
+
+/**
+    @brief The functions camicasa::convertBinarizedFrame is a method for inverting ou maintaining the input image binarization 
+    considering the premise that the most abundant color is not the focus of the frame
+    @param[in] input binarized image frame input cv::Mat
+    @param[out] output binarized image frame output cv::Mat with mode of choice
+    @param mode optional mode that describes which color should the impoortant information be (default IMPORTANT_WHITE)
+ */
+void camicasa::convertBinarizedFrame(Mat& input, Mat& output, int mode){
+    output = input.clone();
+
+    bool mostWhite = false;
+
+    Scalar mean = cv::mean(input);
+    if (mean(0) > 127)
+        mostWhite = true;
+
+    if ((mostWhite && mode == IMPORTANT_IN_WHITE)
+    || (!mostWhite && mode == IMPORTANT_IN_BLACK))
+        output = ~input;
+}
+
 /**
     @brief The functions camicasa::cropLogo is a method for finding the logo present and cropping the input frame
     @param[in] inputOriginal original image frame input cv::Mat
-    @param[in] inputCompared compared image frame with bitwise_and operation input cv::Mat
+    @param[in] inputBitwise compared image frame with bitwise_and operation input cv::Mat
     @param[out] output image frame output cv::Mat with only the logo
  */
-void camicasa::cropLogo(Mat& inputOriginal, Mat& inputCompared, Mat& output){
-    // TODO: get only the part that matters
-    output = inputOriginal.clone();
+void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
+    Mat bitwise;
+    bitwise_and(inputOriginal, inputBitwise, bitwise);
+    imshow("Bitwise", bitwise);
+
+    Mat bitwise_gray;
+    cvtColor(bitwise, bitwise_gray, COLOR_BGR2GRAY);
+
+    Mat otsuThresh;
+    threshold(bitwise_gray, otsuThresh, 0, 255, THRESH_OTSU);
+    convertBinarizedFrame(otsuThresh, otsuThresh, IMPORTANT_IN_WHITE);
+    imshow("Otsu", otsuThresh);
+
+    Mat opening;
+    //openingMorphOperation(otsuThresh, opening);
+
+
+    int startX = 0;
+    int startY = 0;
+    int endX = 0;
+    int endY = 0;
+
+    int margin = 15;
+
+    bool foundStartX = false;
+    bool foundStartY = false;
+
+    for (int row = 0; row < inputOriginal.rows; row++){
+        for (int column = 0; column < inputOriginal.cols; column++){
+            int value = (int)otsuThresh.at<uchar>(row, column);
+
+            // FIXME: tolerancia para pixels pretos/brancos
+
+            if (value && row < startY){
+                startY = row;
+                foundStartY = true;
+            }
+
+            if (value && column < startX){
+                startX = column;
+                foundStartX = true;
+            }
+
+            if (!foundStartX && value){
+                startX = column;
+                foundStartX = true;
+            }
+
+            if (foundStartX && value){
+                endX = column;
+            }
+
+            if (!foundStartY && value){
+                startY = row;
+                foundStartY = true;
+            }
+
+            if (foundStartY && value){
+                endY = row;
+            }
+        }
+    }
+
+    // margin calculation, making sure it doesn't overflow
+    startX = (startX - margin >= 0) ? startX - margin : 0;
+    startY = (startY - margin >= 0) ? startY - margin : 0;
+    endX = (endX + margin < inputOriginal.cols) ? endX + margin : inputOriginal.cols - 1;
+    endY = (endY + margin < inputOriginal.rows) ? endY + margin : inputOriginal.rows - 1;
+
+    output = inputOriginal(Range(startY, endY), Range(startX, endX));
+}
+
+void camicasa::openingMorphOperation(Mat& input, Mat& output){
+    // Create a structuring element
+    int morph_size = 2;
+    Mat element = getStructuringElement(
+        MORPH_ELLIPSE,
+        Size(2 * morph_size + 1,
+             2 * morph_size + 1));
+  
+    // Opening
+    morphologyEx(input, output,
+                 MORPH_OPEN, element);
+  
+    // Display the image
+    imshow("source", input);
+    imshow("Opening", output);
 }

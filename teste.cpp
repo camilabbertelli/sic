@@ -14,8 +14,8 @@ int main(int argc, char** argv)
     Mat croppedCompare;
     Mat logo;
 
-    croppedOriginal = imread("testeLogo/logo1.jpg");
-    croppedCompare = imread("testeLogo/testeeee.jpg");
+    croppedOriginal = imread("logos/croppedOriginal.jpg");
+    croppedCompare = imread("logos/croppedCompare.jpg");
 
     cropLogo(croppedOriginal, croppedCompare, logo);
 

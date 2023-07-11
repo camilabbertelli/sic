@@ -113,6 +113,12 @@ int main(int argc, char** argv)
             currentSegment.startTimestamp = timestamp;
         } else{
             startSegment = true;
+
+            int frameNumber = vidCapture.get(CAP_PROP_POS_FRAMES);
+
+            if (frameNumber % fps != 0)
+                continue;
+
             if (previousFrame.empty()){
                 currentFrame = frame.clone();
 
@@ -132,23 +138,25 @@ int main(int argc, char** argv)
             logoName.str("");
             Mat croppedOriginal;
             Mat croppedCompare;
+
+            int minimumTime = 70;
             
-            if (!stillLogo && frameStillCount[0] > fps*20){
+            if (!stillLogo && frameStillCount[0] > minimumTime){
                 logoFound = true;
                 croppedOriginal = frame(Range(0, corners.at(0).y), Range(0, corners.at(0).x));
                 croppedCompare = operationCompare(Range(0, corners.at(0).y), Range(0, corners.at(0).x));
                 puts("Found potential logo top left!");
-            } else if (!logoFound && frameStillCount[1] > fps*20){
+            } else if (!logoFound && frameStillCount[1] > minimumTime){
                 logoFound = true;
                 croppedOriginal = frame(Range(0, corners.at(1).y), Range(frameWidth - corners.at(1).x, frameWidth));
                 croppedCompare = operationCompare(Range(0, corners.at(1).y), Range(frameWidth - corners.at(1).x, frameWidth));
                 puts("Found potential logo top right!");
-            } else if (!logoFound && frameStillCount[2] > fps*20){
+            } else if (!logoFound && frameStillCount[2] > minimumTime){
                 logoFound = true;
                 croppedOriginal = frame(Range(frameHeight - corners.at(2).y, frameHeight), Range(0, corners.at(2).x));
                 croppedCompare = operationCompare(Range(frameHeight - corners.at(2).y, frameHeight), Range(0, corners.at(2).x));
                 puts("Found potential logo bottom left!");
-            } else if (!logoFound && frameStillCount[3] > fps*20){
+            } else if (!logoFound && frameStillCount[3] > minimumTime){
                 logoFound = true;
                 croppedOriginal = frame(Range(frameHeight - corners.at(3).y, frameHeight), Range(frameWidth - corners.at(3).x, frameWidth));
                 croppedCompare = operationCompare(Range(frameHeight - corners.at(3).y, frameHeight), Range(frameWidth - corners.at(3).x, frameWidth));
@@ -162,7 +170,11 @@ int main(int argc, char** argv)
                 
                 Mat logo;
                 cropLogo(croppedOriginal, croppedCompare, logo);
+                
                 imwrite(logoName.str(), logo);
+
+                imwrite("logos/croppedCompare.jpg", croppedCompare);
+                imwrite("logos/croppedOriginal.jpg", croppedOriginal);
             }
 
             if ((sum(frameStillCount))(0) == 0){
@@ -171,8 +183,8 @@ int main(int argc, char** argv)
             }
         }
         
-        /*if (startSegment)
-            writer.write(frame);*/
+        //if (startSegment)
+        //  writer.write(frame);
 
         /*imshow("Frame", frame);
 

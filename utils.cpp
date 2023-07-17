@@ -2,54 +2,232 @@
 
 using namespace camicasa;
 
-/**
-    @brief The function camicasa::screenThresholdDetection is a method for detecting if the average of pixels(BGR) falls under/above a certain threshold
-    @param frame image frame input cv::Mat
-    @param operation defines which comparison to execute (camicasa::CHECK_SMALLER, camicasa::CHECK_BIGGER)
-    @param threshold optional threshold to compare
-    @returns returns true if frame presented has average pixels that fall under/above the specified threshold
-*/
-bool camicasa::screenThresholdDetection(Mat &frame, int operation /*CHECK_SMALLER*/, int threshold /*1*/)
+camicasa::TVChannel::TVChannel(int frameWidth,  int frameHeight, int fps, int minimumTime) {
+    this->frameWidth = frameWidth;
+    this->frameHeight = frameHeight;
+    this->fps = fps;
+    this->minimumTime = minimumTime;
+    this->frameStillCount = {0, 0, 0, 0};
+    this->populateCorners(); 
+}
+
+camicasa::TVChannel::~TVChannel() {
+    corners.clear();
+    segments.clear();
+    frameStillCount.clear();
+}
+
+void camicasa::TVChannel::populateCorners(){
+    /*
+
+        ---++++++---n
+        --§++++++§--
+        ++++++++++++
+        --§++++++§--
+        ---++++++---
+
+        § : represents the points in this ficticious grid (Mat image)
+        - : represents points of interest to check for logos
+
+        */
+
+    int widthFactor = 7;
+    int heightFactor = 5;
+
+    int x = 0 + frameWidth / widthFactor;
+    int y = 0 + frameHeight / heightFactor;
+    int w = frameWidth - x;
+    int z = frameHeight - y;
+
+    this->corners.push_back(Point(x, y));
+    this->corners.push_back(Point(w, y));
+    this->corners.push_back(Point(x, z));
+    this->corners.push_back(Point(w, z));
+}
+
+void camicasa::TVChannel::addSegment(Segment segment){
+    this->segments.push_back(segment);
+}
+
+void camicasa::TVChannel::addLogo(Logo logo)
+{
+    this->logos.push_back(logo);
+}
+
+vector<Point> camicasa::TVChannel::getCorners() {
+    return this->corners;
+}
+
+vector<int> camicasa::TVChannel::getFrameStillCount()
+{
+    return this->frameStillCount;
+}
+
+vector<Segment> camicasa::TVChannel::getSegments() {
+    return this->segments;
+}
+
+vector<Logo> camicasa::TVChannel::getLogos() {
+    return this->logos;
+}
+
+bool camicasa::screenThresholdDetection(Mat &frame, ComparisonOperation operation /*CHECK_SMALLER*/, int threshold /*1*/)
 {
     Scalar mean = cv::mean(frame);
-    int avg = (mean(0) + mean(1) + mean(2)) / 3;
-    if (operation)
-        return (avg < threshold);
 
-    return (avg > threshold);
+    int avg = (mean(0) + mean(1) + mean(2)) / (frame.channels());
+
+    //cout << "avg " << avg << "\n";
+
+    if (operation == CHECK_SMALLER)
+        return (avg <= threshold);
+
+
+
+    return (avg >= threshold);
 }
 
-/**
-    @brief The function camicasa::hasSaturatedCorners is a method for detecting if any corner on the screen has their average pixels under/above the specified threshold 
-    @param frame image frame input cv::Mat
-    @param corners vector of cv::Points that define all four corners of the screen 
-    @param frameWidth number of horizontal pixels of the given frame
-    @param frameHeight number of vertical pixels of the given frame
-    @param operation defines which comparison to execute (camicasa::CHECK_SMALLER, camicasa::CHECK_BIGGER)
-    @param threshold optional threshold to compare
-    @returns returns true if any of the four corners have saturated pixels under/above the specified threshold
-    @note See more in getCornersScreen(int frameWidth, int frameHeight)
-*/
-void camicasa::hasSaturatedCorners(Mat &frame, vector<Point> corners, vector<int>& frameStillCount, int frameWidth, int frameHeight, int operation /*CHECK_SMALLER*/, int threshold /*1*/)
+void camicasa::TVChannel::checkForSaturatedCorners(Mat &frame, ComparisonOperation operation /*CHECK_SMALLER*/, int threshold /*1*/)
 {
-
     // get the four cropped frames representing the corners
-    Mat topLeft = frame(Range(0, corners.at(0).y), Range(0, corners.at(0).x));
-    Mat topRight = frame(Range(0, corners.at(1).y), Range(frameWidth - corners.at(1).x, frameWidth));
-    Mat bottomLeft = frame(Range(frameHeight - corners.at(2).y, frameHeight), Range(0, corners.at(2).x));
-    Mat bottomRight = frame(Range(0, corners.at(3).y), Range(frameWidth - corners.at(3).x, frameWidth));
 
-    frameStillCount[0] = (screenThresholdDetection(topLeft, operation, threshold)) ? 0 : frameStillCount[0] + 1;
-    frameStillCount[1] = (screenThresholdDetection(topRight, operation, threshold)) ? 0 : frameStillCount[1] + 1;
-    frameStillCount[2] = (screenThresholdDetection(bottomLeft, operation, threshold)) ? 0 : frameStillCount[2] + 1;
-    frameStillCount[3] = (screenThresholdDetection(bottomRight, operation, threshold)) ? 0 : frameStillCount[3] + 1;
+    Mat topLeft = frame(Range(0, this->corners.at(TOP_LEFT).y), Range(0, this->corners.at(TOP_LEFT).x));
+    Mat topRight = frame(Range(0, this->corners.at(TOP_RIGHT).y), Range(this->frameWidth - this->corners.at(TOP_RIGHT).x, this->frameWidth));
+    Mat bottomLeft = frame(Range(this->frameHeight - this->corners.at(BOTTOM_LEFT).y, this->frameHeight), Range(0, this->corners.at(BOTTOM_LEFT).x));
+    Mat bottomRight = frame(Range(0, this->corners.at(BOTTOM_RIGHT).y), Range(this->frameWidth - this->corners.at(BOTTOM_RIGHT).x, this->frameWidth));
+
+    this->frameStillCount[TOP_LEFT] = (screenThresholdDetection(topLeft, operation, threshold)) ? 0 : this->frameStillCount[TOP_LEFT] + 1;
+    this->frameStillCount[TOP_RIGHT] = (screenThresholdDetection(topRight, operation, threshold)) ? 0 : this->frameStillCount[TOP_RIGHT] + 1;
+    this->frameStillCount[BOTTOM_LEFT] = (screenThresholdDetection(bottomLeft, operation, threshold)) ? 0 : this->frameStillCount[BOTTOM_LEFT] + 1;
+    this->frameStillCount[BOTTOM_RIGHT] = (screenThresholdDetection(bottomRight, operation, threshold)) ? 0 : this->frameStillCount[BOTTOM_RIGHT] + 1;
 }
 
-/**
-    @brief The function camicasa::formatTimestamp is a method converting the duration in milliseconds for human reading
-    @param duration in milliseconds
-    @returns returns string with the format h:m:s
-*/
+void camicasa::TVChannel::findLogo(Mat& inputOriginal, Mat& inputBitwise, Logo& logo){
+    Mat croppedOriginal;
+    Mat croppedBitwise;
+    ScreenCorner corner = NONE;
+    
+    if (this->frameStillCount[TOP_LEFT] >= this->minimumTime)
+    {
+        corner = TOP_LEFT;
+        croppedOriginal = inputOriginal(Range(0, this->corners.at(corner).y), Range(0, this->corners.at(corner).x));
+        croppedBitwise = inputBitwise(Range(0, this->corners.at(corner).y), Range(0, this->corners.at(corner).x));    
+    }
+    else if (this->frameStillCount[1] >= this->minimumTime)
+    {
+        corner = TOP_RIGHT;
+        croppedOriginal = inputOriginal(Range(0, this->corners.at(corner).y), Range(this->frameWidth - this->corners.at(corner).x, this->frameWidth));
+        croppedBitwise = inputBitwise(Range(0, this->corners.at(corner).y), Range(this->frameWidth - this->corners.at(corner).x, this->frameWidth));
+    }
+    else if (this->frameStillCount[BOTTOM_LEFT] >= this->minimumTime)
+    {
+        corner = BOTTOM_LEFT;
+        croppedOriginal = inputOriginal(Range(this->frameHeight - this->corners.at(corner).y, this->frameHeight), Range(0, this->corners.at(corner).x));
+        croppedBitwise = inputBitwise(Range(this->frameHeight - this->corners.at(corner).y, this->frameHeight), Range(0, this->corners.at(corner).x));
+    }
+    else if (this->frameStillCount[BOTTOM_RIGHT] >= this->minimumTime)
+    {
+        corner = BOTTOM_RIGHT;
+        croppedOriginal = inputOriginal(Range(this->frameHeight - this->corners.at(corner).y, this->frameHeight), Range(this->frameWidth - this->corners.at(corner).x, this->frameWidth));
+        croppedBitwise = inputBitwise(Range(this->frameHeight - this->corners.at(corner).y, this->frameHeight), Range(this->frameWidth - this->corners.at(corner).x, this->frameWidth));
+    }
+
+    logo.screenCorner = corner;
+    
+    // no logo found
+    if (corner == NONE)
+        return;
+
+    cropLogo(croppedOriginal, croppedBitwise, logo);
+}
+
+bool camicasa::TVChannel::hasStillFrames(){
+    int sum = 0;
+
+    for (int i = 0; i < this->frameStillCount.size(); i++)
+        sum += this->frameStillCount.at(i);
+
+    return sum;
+}
+
+bool camicasa::TVChannel::hasMinimumTimePassed(int time){
+    return time >= this->minimumTime;
+}
+
+bool camicasa::TVChannel::findPatternLogo(Mat &input, Logo& pattern)
+{
+    // crop the same area as the pattern
+    Mat cropped;
+    cropped = input(Range(pattern.y, pattern.y + pattern.height), Range(pattern.x, pattern.x + pattern.width));
+
+    // remove color factor, since it's not relevant
+    Mat inputGray;
+    cvtColor(cropped, inputGray, COLOR_BGR2GRAY);
+
+    Mat patternGray;
+    cvtColor(pattern.image, patternGray, COLOR_BGR2GRAY);
+
+    // // blur the image, so the edge detection (canny) works better
+    Mat inputBlur;
+    GaussianBlur(inputGray, inputBlur, Size(5, 5), 0);
+
+    Mat patternBlur;
+    GaussianBlur(patternGray, patternBlur, Size(5, 5), 0);
+
+    // canny edge detection
+    Mat inputEdges;
+    Canny(inputBlur, inputEdges, 50, 60, 3, true);
+
+    Mat patternEdges;
+    Canny(patternBlur, patternEdges, 50, 100, 3);
+
+    Mat bitwise;
+    bitwise_and(patternEdges, inputEdges, bitwise);
+    
+    //imshow("Input", input);
+    //imshow("Logo", pattern.image);
+    //imshow("Cropped", cropped);
+
+    //imshow("Canny input", inputEdges);
+    //imshow("Canny pattern", patternEdges);
+    waitKey(0);
+    cv::destroyAllWindows();
+    return (screenThresholdDetection(bitwise, CHECK_BIGGER, 15));
+
+    // // blur the image, so the edge detection (canny) works better
+    //Mat inputBlur;
+    //GaussianBlur(inputGray, inputBlur, Size(5, 5), 0);
+
+    //Mat patternBlur;
+    //GaussianBlur(patternGray, patternBlur, Size(5, 5), 0);
+
+
+    // canny edge detection
+    // Mat inputEdges;
+    // Canny(inputGray, inputEdges, 50, 60);
+
+    // Mat patternEdges;
+    // Canny(patternGray, patternEdges, 50, 100);
+
+    // template matching
+    // Mat output;
+    // matchTemplate(inputGray, patternGray, output, TM_CCOEFF_NORMED);
+
+    // waitKey(0);
+    // cv::destroyAllWindows();
+
+    
+    // double minVal;
+    // double maxVal;
+    // Point maxLoc;
+    // Point minLoc;
+    // minMaxLoc(output, &minVal, &maxVal, &minLoc, &maxLoc, Mat());
+
+    // cout << "Btw, maxVal is " << maxVal << "\n";
+
+    // return (maxVal > 0.85);
+}
+
 string camicasa::formatTimestamp(int duration)
 {
     int hour = (int)((duration / (1000 * 60 * 60)) % 24);
@@ -60,54 +238,8 @@ string camicasa::formatTimestamp(int duration)
     return ss.str();
 }
 
-/**
-    @brief The functions camicasa::getCornersScreen is a method for finding all four corners of the screen with some margin
-    @param frameWidth number of horizontal pixels of the given frame
-    @param frameHeight number of vertical pixels of the given frame
-    @returns vector of cv::Points that define all four corners of the screen
- */
-vector<Point> camicasa::getCornersScreen(int frameWidth, int frameHeight)
+void camicasa::convertBinarizedFrame(Mat &input, Mat &output, BinarizationMode mode)
 {
-    vector<Point> vec;
-
-    /*
-
-    ---++++++---n
-    --§++++++§--
-    ++++++++++++
-    --§++++++§--
-    ---++++++---
-
-    § : represents the points in this ficticious grid (Mat image)
-    - : represents points of interest to check for logos
-
-    */
-
-    int widthFactor = 7;
-    int heightFactor = 5;
-
-    int x = 0 + frameWidth / widthFactor;
-    int y = 0 + frameHeight / heightFactor;
-    int w = frameWidth - x;
-    int z = frameHeight - y;
-
-    vec.push_back(Point(x, y));
-    vec.push_back(Point(w, y));
-    vec.push_back(Point(x, z));
-    vec.push_back(Point(w, z));
-
-    return vec;
-}
-
-
-/**
-    @brief The functions camicasa::convertBinarizedFrame is a method for inverting ou maintaining the input image binarization 
-    considering the premise that the most abundant color is not the focus of the frame
-    @param[in] input binarized image frame input cv::Mat
-    @param[out] output binarized image frame output cv::Mat with mode of choice
-    @param mode optional mode that describes which color should the impoortant information be (default IMPORTANT_WHITE)
- */
-void camicasa::convertBinarizedFrame(Mat& input, Mat& output, int mode){
     output = input.clone();
 
     bool mostWhite = false;
@@ -116,18 +248,12 @@ void camicasa::convertBinarizedFrame(Mat& input, Mat& output, int mode){
     if (mean(0) > 127)
         mostWhite = true;
 
-    if ((mostWhite && mode == IMPORTANT_IN_WHITE)
-    || (!mostWhite && mode == IMPORTANT_IN_BLACK))
+    if ((mostWhite && (mode == HIGHLIGHT_IN_WHITE)) || (!mostWhite && (mode == HIGHLIGHT_IN_BLACK)))
         output = ~input;
 }
 
-/**
-    @brief The functions camicasa::cropLogo is a method for finding the logo present and cropping the input frame
-    @param[in] inputOriginal original image frame input cv::Mat
-    @param[in] inputBitwise compared image frame with bitwise_and operation input cv::Mat
-    @param[out] output image frame output cv::Mat with only the logo
- */
-void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
+void camicasa::cropLogo(Mat &inputOriginal, Mat &inputBitwise, Logo& output)
+{
     Mat bitwise;
     bitwise_and(inputOriginal, inputBitwise, bitwise);
 
@@ -136,10 +262,8 @@ void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
 
     Mat otsuThresh;
     threshold(bitwise_gray, otsuThresh, 0, 255, THRESH_OTSU);
-    convertBinarizedFrame(otsuThresh, otsuThresh, IMPORTANT_IN_WHITE);
-    imshow("Otsu", otsuThresh);
+    convertBinarizedFrame(otsuThresh, otsuThresh, HIGHLIGHT_IN_WHITE);
 
-    Mat opening;
     morphOperation(otsuThresh, otsuThresh);
 
     int startX = 0;
@@ -147,44 +271,48 @@ void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
     int endX = 0;
     int endY = 0;
 
-    int margin = 15;
+    int margin = 5;
 
     bool foundStartX = false;
     bool foundStartY = false;
 
-    vector<vector<Point>> possibleSquares;
-
-    for (int row = 0; row < inputOriginal.rows; row++){
-        for (int column = 0; column < inputOriginal.cols; column++){
+    for (int row = 0; row < inputOriginal.rows; row++)
+    {
+        for (int column = 0; column < inputOriginal.cols; column++)
+        {
             int value = (int)otsuThresh.at<uchar>(row, column);
 
-            // FIXME: tolerancia para pixels pretos/brancos
-
-            if (value && row < startY){
+            if (value && row < startY)
+            {
                 startY = row;
                 foundStartY = true;
             }
 
-            if (value && column < startX){
+            if (value && column < startX)
+            {
                 startX = column;
                 foundStartX = true;
             }
 
-            if (!foundStartX && value){
+            if (!foundStartX && value)
+            {
                 startX = column;
                 foundStartX = true;
             }
 
-            if (foundStartX && value && column >= endX){
+            if (foundStartX && value && column >= endX)
+            {
                 endX = column;
             }
 
-            if (!foundStartY && value){
+            if (!foundStartY && value)
+            {
                 startY = row;
                 foundStartY = true;
             }
 
-            if (foundStartY && value && row >= endY){
+            if (foundStartY && value && row >= endY)
+            {
                 endY = row;
             }
         }
@@ -196,21 +324,19 @@ void camicasa::cropLogo(Mat& inputOriginal, Mat& inputBitwise, Mat& output){
     endX = (endX + margin < inputOriginal.cols) ? endX + margin : inputOriginal.cols - 1;
     endY = (endY + margin < inputOriginal.rows) ? endY + margin : inputOriginal.rows - 1;
 
-    output = inputOriginal(Range(startY, endY), Range(startX, endX));
+    output.x = startX;
+    output.y = startY;
+    output.width = endX - startX;
+    output.height = endY - startY;
+    output.image = inputBitwise(Range(startY, endY), Range(startX, endX));
 }
 
-
-/**
-    @brief The functions camicasa::morphOperation is a method for removing dots and loose pixels in the input frame
-    utilizing the cv::morphologyEx function
-    @param[in] input image frame input cv::Mat
-    @param[out] output image frame output cv::Mat
- */
-void camicasa::morphOperation(Mat& input, Mat& output){
-    // Create a structuring element
-    int morph_size = 1;
+void camicasa::morphOperation(Mat &input, Mat &output)
+{
+    // create structuring elements (more weight on dilate than erode)
+    int morph_size = 2;
     Mat element1 = getStructuringElement(
-        MORPH_CROSS,
+        MORPH_RECT,
         Size(2 * morph_size + 1,
              2 * morph_size + 1));
 
@@ -219,13 +345,72 @@ void camicasa::morphOperation(Mat& input, Mat& output){
         MORPH_RECT,
         Size(2 * morph_size + 1,
              2 * morph_size + 1));
-  
-    // Transformations
+
+    // transformations
     Mat aux;
     erode(input, aux, element1);
     dilate(aux, output, element2);
+}
 
-    // Display the image
-    imshow("Aux", aux);
-    imshow("Output", output);
+double camicasa::distancePointRectangle(Point point, vector<Point> rectangle)
+{
+
+    Point rect_min = rectangle.at(0);
+    Point rect_max = rectangle.at(1);
+
+    if (point.x < rect_min.x)
+    {
+        if (point.y < rect_min.y)
+            return distancePoints(point, rect_min);
+        if (point.y > rect_max.y)
+            return distancePoints(point, Point(rect_min.x, rect_max.y));
+
+        return abs(point.x - rect_min.x);
+    }
+
+    if (point.x > rect_max.x)
+    {
+
+        if (point.y < rect_min.y)
+            return distancePoints(point, Point(rect_max.x, rect_min.y));
+        if (point.y > rect_max.y)
+            return distancePoints(point, rect_max);
+
+        return abs(point.x - rect_max.x);
+    }
+
+    // point.x <= rect_max.x (potentially inside)
+    if (point.y < rect_min.y)
+        return abs(point.y - rect_min.y);
+    if (point.y > rect_max.y)
+        return abs(point.y - rect_max.y);
+
+    // point is inside rectangle
+    return 0;
+}
+
+double camicasa::distancePoints(Point a, Point b)
+{
+    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
+}
+
+const char* camicasa::stringifyTVChannelType(TVChannelType item){
+
+    const char *convert_enum[] = {
+        stringify(AD),
+        stringify(PROGRAM)};
+
+    return convert_enum[item];
+}
+
+const char* camicasa::stringifyScreenCorner(ScreenCorner item){
+
+    const char *convert_enum[] = {
+        stringify(TOP_LEFT),
+        stringify(TOP_RIGHT),
+        stringify(BOTTOM_LEFT),
+        stringify(BOTTOM_RIGHT)
+    };
+
+    return convert_enum[item];
 }

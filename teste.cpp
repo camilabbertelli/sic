@@ -1,6 +1,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
+#include <list>
 #include "utils.hpp"
 
 using namespace std;
@@ -12,18 +13,35 @@ int main(int argc, char** argv)
 {
     Mat croppedOriginal;
     Mat croppedCompare;
-    Mat logo;
+    Mat golden;
+
+    list<Mat> elements;
 
     croppedOriginal = imread("testeLogo/croppedOriginal.jpg");
     croppedCompare = imread("testeLogo/croppedCompare.jpg");
+    Mat frame = imread("testeLogo/frame1.jpg");
+    Mat logoImage = imread ("logos/logo1.jpg");
+    Mat fake = imread("testeLogo/fake.jpg");
+    Mat aaaa = imread("testeLogo/aaaa.jpg");
 
-    cropLogo(croppedOriginal, croppedCompare, logo);
+    Logo logo;
 
-    imshow("Compared", croppedCompare);
-    imshow("Final logo", logo);
+    logo.screenCorner = TOP_LEFT;
+    logo.image = logoImage.clone();
+    
+    logo.height = 35;
+    logo.width = 66;
+    logo.x = 94;
+    logo.y = 33;
 
-    waitKey(0);
-    cv::destroyAllWindows();
+    TVChannel *channel = new TVChannel(1280, 720, 30);
+
+    if (channel->findPatternLogo(frame, logo))
+        cout << "Nice frame!\n";
+    if (channel->findPatternLogo(fake, logo))
+        cout << "Ohh :( fake!\n";
+    if (channel->findPatternLogo(aaaa, logo))
+        cout << "Ohh :( aaaa!\n";
 
     return 0;
 }

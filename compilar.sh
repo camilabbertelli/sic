@@ -1,1 +1,1 @@
-g++ teste.cpp utils.cpp -o teste `pkg-config --cflags --libs opencv4`
+g++ sic.cpp utils.cpp -o app `pkg-config --cflags --libs opencv4` -ljsoncpp

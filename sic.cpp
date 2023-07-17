@@ -1,22 +1,16 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <bits/stdc++.h>
-#include <iostream>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <vector>
-#include "utils.hpp"
+#include "utils.hpp" 
+#include <jsoncpp/json/json.h>
+#include <fstream>
 
 using namespace std;
 using namespace cv;
 using namespace camicasa;
 
-
-struct segment {
-    int id = 1;
-    int startTimestamp = 0;
-    int endTimestamp = 0;
-};
 
 int main(int argc, char** argv)
 {
@@ -30,7 +24,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-    // Obtain frame size information using get() method
+    // obtain frame information
 	int frameWidth = vidCapture.get(CAP_PROP_FRAME_WIDTH);
 	int frameHeight = vidCapture.get(CAP_PROP_FRAME_HEIGHT);
     int fps = vidCapture.get(CAP_PROP_FPS);
@@ -39,171 +33,283 @@ int main(int argc, char** argv)
     cout << "Frame height: " << frameHeight << "\n";
     cout << "FPS: " << fps << "\n";
 
+
+    // reset folders to store retrieved data
     system("rm -r videos");
     system("rm -r logos");
     mkdir("videos", 0777);
     mkdir("logos", 0777);
 
-    // variables used to control states
 
+    // minimum time in seconds for a segment to be considered a program
+    int minimumTime = 60;
+    int timestamp = 0;
+
+    TVChannel *channel = new TVChannel(frameWidth, frameHeight, fps, minimumTime);
+
+    /**
+     **** LOGO DETECTION ****
+     */
+    // variables used to control states
+    bool logoAlreadyFound = false;
+
+    Logo currentLogo;
+
+    // variables used to store frames
+    Mat currentFrame;
+    Mat previousFrame;
+    Mat operationBitwise;
+
+    /**
+     **** SEGMENT CLASSIFICATION ****
+     */
+    // variables used to control states
     bool alreadyBlack = false;
     bool startSegment = false;
 
-    segment currentSegment;
+    Segment currentSegment;
 
-    Mat frame;
-    int timestamp;
+    // json variables
+    Json::Value json;
+    Json::Value logoVec(Json::arrayValue);
+    Json::Value segmentVec(Json::arrayValue);
 
-    Mat currentFrame;
-    Mat previousFrame;
-    Mat operationCompare;
-    int logoCount = 1;
-    bool logoFound = false;
-    bool stillLogo = false;
-
-    vector<Point> corners = getCornersScreen(frameWidth, frameHeight);
-    vector<int> frameStillCount = {0, 0, 0, 0};
-
-    list<segment> segments;
-
-    // Initialize writer object
-    stringstream videoName;
-    videoName << "videos/segment" << currentSegment.id << ".mp4";
-	VideoWriter writer;
-    writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
-    
+    // first reading of all frames to detect logos and classify segments
     while (vidCapture.isOpened()){
-
+        Mat frame;
         vidCapture >> frame;
-        if(frame.empty())
-        {
-            if (startSegment){
-                cout << "End of segment " << currentSegment.id << " at " << formatTimestamp(timestamp) << "\n";
+        if (frame.empty()){
+            if (startSegment)
+            {
                 currentSegment.endTimestamp = timestamp;
-                segments.push_back(currentSegment);
+                channel->addSegment(currentSegment);
+                currentSegment.id++;
+                currentSegment.type = AD;
+                logoAlreadyFound = false;
             }
-            puts("Video has been disconnected");
             break;
         }
-        
 
         timestamp = vidCapture.get(CAP_PROP_POS_MSEC);
-        
-        if (!alreadyBlack && screenThresholdDetection(frame)){
-            
-            if (startSegment){
-                cout << "End of segment " << currentSegment.id << " at " << formatTimestamp(timestamp) << "\n";
-                
+
+        if (!alreadyBlack && screenThresholdDetection(frame))
+        {
+            if (startSegment)
+            {
                 currentSegment.endTimestamp = timestamp;
-                segments.push_back(currentSegment);
-                
-                videoName.str(std::string());
-                videoName << "videos/segment" << ++currentSegment.id << ".mp4";
-               
-                writer.open(videoName.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps , Size(frameWidth, frameHeight));
-                
+
+                channel->addSegment(currentSegment);
+                currentSegment.id++;
+                currentSegment.type=AD;
                 startSegment = false;
+                logoAlreadyFound = false;
             }
 
             alreadyBlack = true;
-        } else if (alreadyBlack && !screenThresholdDetection(frame)){
-            if (!startSegment){
-                cout << "\nStart of segment " << currentSegment.id << " at " << formatTimestamp(timestamp) << "\n";
-                startSegment = true;
+        }
+        else
+        {
+            if (alreadyBlack && !screenThresholdDetection(frame))
+                alreadyBlack = false;
+
+            if (!startSegment)
+            {
                 currentSegment.startTimestamp = timestamp;
-            }
-            alreadyBlack = false;
-        } else{
-            if (!startSegment){
-                cout << "\nStart of segment " << currentSegment.id << " at " << formatTimestamp(timestamp) << "\n";
                 startSegment = true;
-                currentSegment.startTimestamp = timestamp;
             }
 
-            int frameNumber = vidCapture.get(CAP_PROP_POS_FRAMES);
+            if (alreadyBlack)
+                continue;
 
-            if (frameNumber % fps == 0){
+            if (!logoAlreadyFound && currentSegment.type != PROGRAM)
+            for (Logo logo : channel->getLogos())
+                if (channel->findPatternLogo(frame, logo)){
+                    cout << "Segment " << currentSegment.id << " changed to program because of logo\n";
+                    currentSegment.type = PROGRAM;
+                    logoAlreadyFound = true;
+                }
 
-            if (previousFrame.empty()){
-                currentFrame = frame.clone();
+            // change segment type after a certain time has passed
+            int passedTime = (timestamp - currentSegment.startTimestamp) / 1000;
+            if (currentSegment.type != PROGRAM && channel->hasMinimumTimePassed(passedTime)){
+                cout << "Segment " << currentSegment.id << " changed to program because of time\n";
+                currentSegment.type = PROGRAM;
+            }
+
+
+            if (!logoAlreadyFound)
+            {
+                // reduce the number of frames to search for a logo if none found
+                int frameNumber = vidCapture.get(CAP_PROP_POS_FRAMES);
+                if (frameNumber % fps == 0){
+
+                if (previousFrame.empty())
+                {
+                    currentFrame = frame.clone();
+
+                    previousFrame = currentFrame.clone();
+                    operationBitwise = previousFrame.clone();
+                    continue;
+                }
 
                 previousFrame = currentFrame.clone();
-                operationCompare = previousFrame.clone();
-                continue;
-            }
+                currentFrame = frame.clone();
 
-            previousFrame = currentFrame.clone();
-            currentFrame = frame.clone();
+                bitwise_and(operationBitwise, currentFrame, operationBitwise);
 
-            bitwise_and(operationCompare, currentFrame, operationCompare);
+                Mat operationBitwiseGray;
+                cvtColor(operationBitwise, operationBitwiseGray, COLOR_BGR2GRAY);
 
-            hasSaturatedCorners(operationCompare, corners, frameStillCount, frameWidth, frameHeight, CHECK_SMALLER, 5);
-            
-            stringstream logoName;
-            logoName.str("");
-            Mat croppedOriginal;
-            Mat croppedCompare;
+                channel->checkForSaturatedCorners(operationBitwiseGray, CHECK_SMALLER, 5);
 
-            int minimumTime = 120;
-            
-            if (!stillLogo && frameStillCount[0] > minimumTime){
-                logoFound = true;
-                croppedOriginal = frame(Range(0, corners.at(0).y), Range(0, corners.at(0).x));
-                croppedCompare = operationCompare(Range(0, corners.at(0).y), Range(0, corners.at(0).x));
-                puts("Found potential logo top left!");
-            } else if (!logoFound && frameStillCount[1] > minimumTime){
-                logoFound = true;
-                croppedOriginal = frame(Range(0, corners.at(1).y), Range(frameWidth - corners.at(1).x, frameWidth));
-                croppedCompare = operationCompare(Range(0, corners.at(1).y), Range(frameWidth - corners.at(1).x, frameWidth));
-                puts("Found potential logo top right!");
-            } else if (!logoFound && frameStillCount[2] > minimumTime){
-                logoFound = true;
-                croppedOriginal = frame(Range(frameHeight - corners.at(2).y, frameHeight), Range(0, corners.at(2).x));
-                croppedCompare = operationCompare(Range(frameHeight - corners.at(2).y, frameHeight), Range(0, corners.at(2).x));
-                puts("Found potential logo bottom left!");
-            } else if (!logoFound && frameStillCount[3] > minimumTime){
-                logoFound = true;
-                croppedOriginal = frame(Range(frameHeight - corners.at(3).y, frameHeight), Range(frameWidth - corners.at(3).x, frameWidth));
-                croppedCompare = operationCompare(Range(frameHeight - corners.at(3).y, frameHeight), Range(frameWidth - corners.at(3).x, frameWidth));
-                puts("Found potential logo bottom right!");
-            }
+                channel->findLogo(currentFrame, operationBitwise, currentLogo);
+               
+                // no logo found
+                if (currentLogo.screenCorner == NONE)
+                    continue;
 
-            if (logoFound){
-                logoFound = false;
-                stillLogo = true;
-                logoName << "logos/logo" << logoCount++ << ".jpg"; 
+                logoAlreadyFound = true;
+
+                cout << "Found logo in " << stringifyScreenCorner(currentLogo.screenCorner) << "!\n";
+
+                stringstream logoWriter;
+                logoWriter << "logos/logo" << currentLogo.id << ".jpg";
+                imwrite(logoWriter.str(), currentLogo.image);
+
+                channel->addLogo(currentLogo);
+                 
+                Json::Value logoJson;
                 
-                Mat logo;
-                cropLogo(croppedOriginal, croppedCompare, logo);
-                
-                imwrite(logoName.str(), logo);
+                logoJson["id"] = currentLogo.id;
+                logoJson["x"] = currentLogo.x;
+                logoJson["y"] = currentLogo.y;
+                logoJson["width"] = currentLogo.width;
+                logoJson["height"] = currentLogo.height;
+                logoJson["corner"] = stringifyScreenCorner(currentLogo.screenCorner);
 
-                //imwrite("logos/croppedCompare.jpg", croppedCompare);
-                //imwrite("logos/croppedOriginal.jpg", croppedOriginal);
+                logoVec.append(logoJson);
+
+                currentLogo.id++;
+                }
             }
 
-            if ((sum(frameStillCount))(0) == 0){
-                operationCompare = previousFrame;
-                stillLogo = false;
-            }
+            if (!channel->hasStillFrames())
+            {
+                operationBitwise = previousFrame;
+
+                if (logoAlreadyFound){
+                    currentSegment.endTimestamp = timestamp;
+                    logoAlreadyFound = false;
+                }
+
             }
         }
-        
-        if (startSegment)
-          writer.write(frame);
+    }
 
-        /*imshow("Frame", frame);
+    // reading video again, but this time to write frames in disk relative to each segment, 
+    // trimming start and end timestamps if necessary
 
-        int key = waitKey(0);
-		if (key == 'q')
-		{
-			puts("Quitting the video");
-			break;
-		}*/
-     }
+    vidCapture.open(argv[1]);
+    timestamp = 0;
 
+    if (!vidCapture.isOpened())
+    {
+        puts("Error opening video stream or file");
+        // Release the video capture object
+        vidCapture.release();
+        cv::destroyAllWindows();
+        return 0;
+    }
+
+    for (int i = 0; i < channel->getSegments().size(); i++)
+    {
+        Segment *segment = new Segment;
+        *segment = channel->getSegments().at(i);
+
+    
+        stringstream segmentWriter;
+        segmentWriter << "videos/segment" << segment->id << ".mp4";
+
+        VideoWriter writer(segmentWriter.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps, Size(frameWidth, frameHeight));
+
+        if (!writer.isOpened()){
+            puts("Error opening video writer");
+            writer.release();
+            continue;
+        }
+
+        int newStart = 0;
+        int newEnd = 0;
+        bool foundNewStart = false;
+
+        while (vidCapture.isOpened() && timestamp < segment->endTimestamp)
+        {
+            Mat frame;
+            vidCapture >> frame;
+
+            if (frame.empty()) {
+                puts("Video has been disconnected");
+                break;
+            }
+
+            timestamp = vidCapture.get(CAP_PROP_POS_MSEC);
+            
+            if (segment->type == PROGRAM){
+                for (Logo logo : channel->getLogos())
+                    if (channel->findPatternLogo(frame, logo)){
+                        if (!foundNewStart){
+                            newStart = timestamp;
+                            foundNewStart = true;
+                        }
+
+                        newEnd = timestamp;
+                        writer.write(frame);
+                        break;
+                    }
+
+            } else writer.write(frame);
+            
+        }
+
+        if (segment->type == PROGRAM){
+            segment->startTimestamp = newStart;
+            segment->endTimestamp = newEnd;
+        }
+
+        Json::Value segmentJson;
+
+        segmentJson["id"] = segment->id;
+        segmentJson["startTimestamp"] = segment->startTimestamp;
+        segmentJson["endTimestamp"] = segment->endTimestamp;
+        segmentJson["type"] = stringifyTVChannelType(segment->type);
+
+        segmentVec.append(segmentJson);
+
+        cout << "\nStart " << stringifyTVChannelType(segment->type) << " of segment " << segment->id << " at " << formatTimestamp(segment->startTimestamp) << "\n";
+        cout << "End of segment " << segment->id << " at " << formatTimestamp(segment->endTimestamp) << "\n";
+
+        writer.release();
+        delete segment;
+    }
+
+    json["logos"] = logoVec;
+    json["segments"] = segmentVec;
+
+
+    // writing thee json object
+
+    if (!json.empty()){
+        ofstream file;
+        file.open("json.txt");
+
+        Json::StyledWriter jsonWriter;
+        file << jsonWriter.write(json);
+
+        file.close();
+    }
+
+    delete channel;
     vidCapture.release();
-    writer.release();
     cv::destroyAllWindows();
 
     return 0;

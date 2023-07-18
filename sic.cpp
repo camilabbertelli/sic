@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 
 
     // minimum time in seconds for a segment to be considered a program
-    int minimumTime = 120;
+    int minimumTime = 60;
     int timestamp = 0;
 
     TVChannel *channel = new TVChannel(frameWidth, frameHeight, fps, minimumTime);
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
     Json::Value logoVec(Json::arrayValue);
     Json::Value segmentVec(Json::arrayValue);
 
-    puts("**** LOGO DETECTION AND SEGMENT CLASSIFICATTION ****");
+    puts("**** LOGO DETECTION AND SEGMENT CLASSIFICATION ****");
 
     // first reading of all frames to detect logos and classify segments
     while (vidCapture.isOpened()){
@@ -84,11 +84,14 @@ int main(int argc, char** argv)
             if (startSegment)
             {
                 currentSegment.endTimestamp = timestamp;
+
                 channel->addSegment(currentSegment);
+                logoAlreadyFound = false;
+                
+                // reset currentSegment
                 currentSegment.id++;
                 currentSegment.type = AD;
                 currentSegment.logoAssociated = -1;
-                logoAlreadyFound = false;
             }
             break;
         }
@@ -102,10 +105,14 @@ int main(int argc, char** argv)
                 currentSegment.endTimestamp = timestamp;
 
                 channel->addSegment(currentSegment);
-                currentSegment.id++;
-                currentSegment.type=AD;
+
                 startSegment = false;
                 logoAlreadyFound = false;
+
+                // reset currentSegment
+                currentSegment.id++;
+                currentSegment.type=AD;
+                currentSegment.logoAssociated= -1;
             }
 
             alreadyBlack = true;
@@ -198,7 +205,9 @@ int main(int argc, char** argv)
                 }
 
                 currentSegment.logoAssociated = currentLogo.id;
+
                 currentLogo.id++;
+
                 }
             }
 
@@ -219,7 +228,6 @@ int main(int argc, char** argv)
     // trimming start and end timestamps if necessary
 
     vidCapture.open(argv[1]);
-    timestamp = 0;
 
     if (!vidCapture.isOpened())
     {
@@ -235,12 +243,60 @@ int main(int argc, char** argv)
 
     for (int i = 0; i < channel->getSegments().size(); i++)
     {
-        Segment *segment = new Segment;
-        *segment = channel->getSegments().at(i);
+        Segment segment = channel->getSegments()[i];
 
-    
+        if (segment.type != PROGRAM)
+            continue;
+
+        int time = 0;
+        int newStart = segment.startTimestamp;
+        int newEnd = segment.startTimestamp;
+        bool foundNewStart = false;
+
+        int frameStart = (segment.startTimestamp/1000) * fps;
+        vidCapture.set(CAP_PROP_POS_FRAMES, frameStart);
+
+        while (vidCapture.isOpened() && time < segment.endTimestamp){
+            Mat frame;
+            vidCapture >> frame;
+
+            if (frame.empty())
+            {
+                puts("Video has been disconnected");
+                break;
+            }
+
+            time = vidCapture.get(CAP_PROP_POS_MSEC);
+
+            for (Logo logo : channel->getLogos())
+                if (channel->findPatternLogo(frame, logo))
+                {
+                    if (!foundNewStart)
+                    {
+                        newStart = time;
+                        foundNewStart = true;
+                    }
+
+                    newEnd = time;
+                    break;
+                }
+            
+        }
+
+        channel->updateSegment(segment.id, newStart, newEnd);
+        
+    }
+
+
+    vidCapture.open(argv[1]);
+    timestamp = 0;
+
+    for (int i = 0; i < channel->getSegments().size(); i++)
+    {
+        Segment segment = channel->getSegments().at(i);
+
         stringstream segmentWriter;
-        segmentWriter << "videos/segment" << segment->id << ".mp4";
+        segmentWriter << "videos/segment" << segment.id << ".mp4";
 
         VideoWriter writer(segmentWriter.str(), VideoWriter::fourcc('a', 'v', 'c', '1'), fps, Size(frameWidth, frameHeight));
 
@@ -250,11 +306,7 @@ int main(int argc, char** argv)
             continue;
         }
 
-        int newStart = 0;
-        int newEnd = 0;
-        bool foundNewStart = false;
-
-        while (vidCapture.isOpened() && timestamp < segment->endTimestamp)
+        while (vidCapture.isOpened() && timestamp < segment.endTimestamp)
         {
             Mat frame;
             vidCapture >> frame;
@@ -266,46 +318,27 @@ int main(int argc, char** argv)
 
             timestamp = vidCapture.get(CAP_PROP_POS_MSEC);
             
-            if (segment->type == PROGRAM){
-                for (Logo logo : channel->getLogos())
-                    if (channel->findPatternLogo(frame, logo)){
-                        if (!foundNewStart){
-                            newStart = timestamp;
-                            foundNewStart = true;
-                        }
-
-                        newEnd = timestamp;
-                        writer.write(frame);
-                        break;
-                    }
-
-            } else writer.write(frame);
-            
-        }
-
-        if (segment->type == PROGRAM){
-            segment->startTimestamp = newStart;
-            segment->endTimestamp = newEnd;
+            if (timestamp >= segment.startTimestamp && timestamp <= segment.endTimestamp)
+                writer.write(frame);
         }
 
         Json::Value segmentJson;
 
-        segmentJson["id"] = segment->id;
-        segmentJson["startTimestamp"] = segment->startTimestamp;
-        segmentJson["endTimestamp"] = segment->endTimestamp;
-        segmentJson["type"] = stringifyTVChannelType(segment->type);
-        segmentJson["logoFound"] = segment->logoAssociated;
+        segmentJson["id"] = segment.id;
+        segmentJson["startTimestamp"] = segment.startTimestamp;
+        segmentJson["endTimestamp"] = segment.endTimestamp;
+        segmentJson["type"] = stringifyTVChannelType(segment.type);
+        segmentJson["logoFound"] = segment.logoAssociated;
 
         segmentVec.append(segmentJson);
         
         puts("");
-        cout << "Start " << stringifyTVChannelType(segment->type) << " of segment " << segment->id << " at " << formatTimestamp(segment->startTimestamp) << "\n";
-        if (segment->logoAssociated != -1)
-            cout << "Logo " << segment->logoAssociated << " was found in this segment\n";
-        cout << "End of segment " << segment->id << " at " << formatTimestamp(segment->endTimestamp) << "\n";
+        cout << "Start " << stringifyTVChannelType(segment.type) << " of segment " << segment.id << " at " << formatTimestamp(segment.startTimestamp) << "\n";
+        if (segment.logoAssociated != -1)
+            cout << "Logo " << segment.logoAssociated << " was found in this segment\n";
+        cout << "End of segment " << segment.id << " at " << formatTimestamp(segment.endTimestamp) << "\n";
 
         writer.release();
-        delete segment;
     }
 
     json["logos"] = logoVec;

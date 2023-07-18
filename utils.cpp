@@ -14,6 +14,7 @@ camicasa::TVChannel::TVChannel(int frameWidth,  int frameHeight, int fps, int mi
 camicasa::TVChannel::~TVChannel() {
     corners.clear();
     segments.clear();
+    logos.clear();
     frameStillCount.clear();
 }
 
@@ -163,7 +164,7 @@ bool camicasa::TVChannel::findPatternLogo(Mat &input, Logo& pattern)
     Mat patternGray;
     cvtColor(pattern.image, patternGray, COLOR_BGR2GRAY);
 
-    // // blur the image, so the edge detection (canny) works better
+    // blur the image, so the edge detection (canny) works better
     Mat inputBlur;
     GaussianBlur(inputGray, inputBlur, Size(5, 5), 0);
 
@@ -181,6 +182,17 @@ bool camicasa::TVChannel::findPatternLogo(Mat &input, Logo& pattern)
     bitwise_and(patternEdges, inputEdges, bitwise);
     
     return (screenThresholdDetection(bitwise, CHECK_BIGGER, 15));
+}
+
+void camicasa::TVChannel::updateSegment(int id, int newStart, int newEnd){
+    for (int i = 0; i < this->segments.size(); i++){
+
+        if (this->segments[i].id == id){
+            this->segments[i].startTimestamp = newStart;
+            this->segments[i].endTimestamp = newEnd;
+            break;
+        }
+    }
 }
 
 string camicasa::formatTimestamp(int duration)

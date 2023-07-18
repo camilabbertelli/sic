@@ -23,6 +23,7 @@ int main(int argc, char** argv)
     Mat logoImage = imread ("logos/logo1.jpg");
     Mat fake = imread("testeLogo/fake.jpg");
     Mat aaaa = imread("testeLogo/aaaa.jpg");
+    Mat bbbb = imread("testeLogo/bbbb.jpg");
 
     Logo logo;
 
@@ -42,6 +43,8 @@ int main(int argc, char** argv)
         cout << "Ohh :( fake!\n";
     if (channel->findPatternLogo(aaaa, logo))
         cout << "Ohh :( aaaa!\n";
+    if (channel->findPatternLogo(bbbb, logo))
+        cout << "Ohh :( bbbb!\n";
 
     return 0;
 }

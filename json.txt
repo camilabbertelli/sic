@@ -2,7 +2,7 @@
    "logos" : [
       {
          "corner" : "TOP_LEFT",
-         "height" : 35,
+         "height" : 38,
          "id" : 1,
          "width" : 66,
          "x" : 94,
@@ -11,87 +11,836 @@
    ],
    "segments" : [
       {
-         "endTimestamp" : 10300,
+         "endTimestamp" : 10000,
          "id" : 1,
          "logoFound" : -1,
-         "startTimestamp" : 33,
+         "startTimestamp" : 0,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 30400,
+         "endTimestamp" : 20040,
          "id" : 2,
          "logoFound" : -1,
-         "startTimestamp" : 10333,
+         "startTimestamp" : 10040,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 50600,
+         "endTimestamp" : 40200,
          "id" : 3,
          "logoFound" : -1,
-         "startTimestamp" : 30433,
+         "startTimestamp" : 20080,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 60733,
+         "endTimestamp" : 60360,
          "id" : 4,
          "logoFound" : -1,
-         "startTimestamp" : 50633,
+         "startTimestamp" : 40240,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 75933,
+         "endTimestamp" : 80480,
          "id" : 5,
          "logoFound" : -1,
-         "startTimestamp" : 60766,
+         "startTimestamp" : 60400,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 96100,
+         "endTimestamp" : 100640,
          "id" : 6,
          "logoFound" : -1,
-         "startTimestamp" : 75966,
+         "startTimestamp" : 80520,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 116233,
+         "endTimestamp" : 113160,
          "id" : 7,
          "logoFound" : -1,
-         "startTimestamp" : 96133,
+         "startTimestamp" : 100680,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 136366,
+         "endTimestamp" : 113240,
          "id" : 8,
          "logoFound" : -1,
-         "startTimestamp" : 116266,
+         "startTimestamp" : 113200,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 235333,
+         "endTimestamp" : 113320,
          "id" : 9,
+         "logoFound" : -1,
+         "startTimestamp" : 113280,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 120800,
+         "id" : 10,
+         "logoFound" : -1,
+         "startTimestamp" : 113360,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 140960,
+         "id" : 11,
+         "logoFound" : -1,
+         "startTimestamp" : 120840,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 161080,
+         "id" : 12,
+         "logoFound" : -1,
+         "startTimestamp" : 141000,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 181280,
+         "id" : 13,
+         "logoFound" : -1,
+         "startTimestamp" : 161120,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 191400,
+         "id" : 14,
+         "logoFound" : -1,
+         "startTimestamp" : 181320,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 206600,
+         "id" : 15,
+         "logoFound" : -1,
+         "startTimestamp" : 191440,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 226760,
+         "id" : 16,
+         "logoFound" : -1,
+         "startTimestamp" : 206640,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 246920,
+         "id" : 17,
+         "logoFound" : -1,
+         "startTimestamp" : 226800,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 267040,
+         "id" : 18,
+         "logoFound" : -1,
+         "startTimestamp" : 246960,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 287200,
+         "id" : 19,
+         "logoFound" : -1,
+         "startTimestamp" : 267080,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 297360,
+         "id" : 20,
+         "logoFound" : -1,
+         "startTimestamp" : 287240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 317520,
+         "id" : 21,
+         "logoFound" : -1,
+         "startTimestamp" : 297400,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 342680,
+         "id" : 22,
+         "logoFound" : -1,
+         "startTimestamp" : 317560,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 362840,
+         "id" : 23,
+         "logoFound" : -1,
+         "startTimestamp" : 342720,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 382960,
+         "id" : 24,
+         "logoFound" : -1,
+         "startTimestamp" : 362880,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 403080,
+         "id" : 25,
+         "logoFound" : -1,
+         "startTimestamp" : 383000,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 423200,
+         "id" : 26,
+         "logoFound" : -1,
+         "startTimestamp" : 403120,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 443360,
+         "id" : 27,
+         "logoFound" : -1,
+         "startTimestamp" : 423240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 463480,
+         "id" : 28,
+         "logoFound" : -1,
+         "startTimestamp" : 443400,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 473640,
+         "id" : 29,
+         "logoFound" : -1,
+         "startTimestamp" : 463520,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 493760,
+         "id" : 30,
+         "logoFound" : -1,
+         "startTimestamp" : 473680,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 513920,
+         "id" : 31,
+         "logoFound" : -1,
+         "startTimestamp" : 493800,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 544040,
+         "id" : 32,
+         "logoFound" : -1,
+         "startTimestamp" : 513960,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 564200,
+         "id" : 33,
+         "logoFound" : -1,
+         "startTimestamp" : 544080,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 584320,
+         "id" : 34,
+         "logoFound" : -1,
+         "startTimestamp" : 564240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 604480,
+         "id" : 35,
+         "logoFound" : -1,
+         "startTimestamp" : 584360,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 624640,
+         "id" : 36,
+         "logoFound" : -1,
+         "startTimestamp" : 604520,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 644760,
+         "id" : 37,
+         "logoFound" : -1,
+         "startTimestamp" : 624680,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 664880,
+         "id" : 38,
+         "logoFound" : -1,
+         "startTimestamp" : 644800,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 685040,
+         "id" : 39,
+         "logoFound" : -1,
+         "startTimestamp" : 664920,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 705200,
+         "id" : 40,
+         "logoFound" : -1,
+         "startTimestamp" : 685080,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 715360,
+         "id" : 41,
+         "logoFound" : -1,
+         "startTimestamp" : 705240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 730480,
+         "id" : 42,
+         "logoFound" : -1,
+         "startTimestamp" : 715400,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 750600,
+         "id" : 43,
+         "logoFound" : -1,
+         "startTimestamp" : 730520,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 770720,
+         "id" : 44,
+         "logoFound" : -1,
+         "startTimestamp" : 750640,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 799800,
+         "id" : 45,
+         "logoFound" : -1,
+         "startTimestamp" : 770760,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 819880,
+         "id" : 46,
+         "logoFound" : -1,
+         "startTimestamp" : 799840,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 840040,
+         "id" : 47,
+         "logoFound" : -1,
+         "startTimestamp" : 819920,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 860200,
+         "id" : 48,
+         "logoFound" : -1,
+         "startTimestamp" : 840080,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 880320,
+         "id" : 49,
+         "logoFound" : -1,
+         "startTimestamp" : 860240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 900480,
+         "id" : 50,
+         "logoFound" : -1,
+         "startTimestamp" : 880360,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 915640,
+         "id" : 51,
+         "logoFound" : -1,
+         "startTimestamp" : 900520,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 920760,
+         "id" : 52,
+         "logoFound" : -1,
+         "startTimestamp" : 915680,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 930920,
+         "id" : 53,
+         "logoFound" : -1,
+         "startTimestamp" : 920800,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 951040,
+         "id" : 54,
+         "logoFound" : -1,
+         "startTimestamp" : 930960,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 981200,
+         "id" : 55,
+         "logoFound" : -1,
+         "startTimestamp" : 951080,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 1006360,
+         "id" : 56,
+         "logoFound" : -1,
+         "startTimestamp" : 981240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 1026480,
+         "id" : 57,
+         "logoFound" : -1,
+         "startTimestamp" : 1006400,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 1046600,
+         "id" : 58,
+         "logoFound" : -1,
+         "startTimestamp" : 1026520,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 1988440,
+         "id" : 59,
          "logoFound" : 1,
-         "startTimestamp" : 145466,
+         "startTimestamp" : 1055840,
          "type" : "PROGRAM"
       },
       {
-         "endTimestamp" : 259766,
-         "id" : 10,
-         "logoFound" : 1,
-         "startTimestamp" : 239833,
+         "endTimestamp" : 2012920,
+         "id" : 60,
+         "logoFound" : -1,
+         "startTimestamp" : 1993000,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 279966,
-         "id" : 11,
-         "logoFound" : 1,
-         "startTimestamp" : 259800,
+         "endTimestamp" : 2033120,
+         "id" : 61,
+         "logoFound" : -1,
+         "startTimestamp" : 2012960,
          "type" : "AD"
       },
       {
-         "endTimestamp" : 284166,
-         "id" : 12,
-         "logoFound" : 1,
-         "startTimestamp" : 280000,
+         "endTimestamp" : 2043240,
+         "id" : 62,
+         "logoFound" : -1,
+         "startTimestamp" : 2033160,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2058400,
+         "id" : 63,
+         "logoFound" : -1,
+         "startTimestamp" : 2043280,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2078560,
+         "id" : 64,
+         "logoFound" : -1,
+         "startTimestamp" : 2058440,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2098680,
+         "id" : 65,
+         "logoFound" : -1,
+         "startTimestamp" : 2078600,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2118840,
+         "id" : 66,
+         "logoFound" : -1,
+         "startTimestamp" : 2098720,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2124000,
+         "id" : 67,
+         "logoFound" : -1,
+         "startTimestamp" : 2118880,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2144160,
+         "id" : 68,
+         "logoFound" : -1,
+         "startTimestamp" : 2124040,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2174280,
+         "id" : 69,
+         "logoFound" : -1,
+         "startTimestamp" : 2144200,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2194400,
+         "id" : 70,
+         "logoFound" : -1,
+         "startTimestamp" : 2174320,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2214520,
+         "id" : 71,
+         "logoFound" : -1,
+         "startTimestamp" : 2194440,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2234640,
+         "id" : 72,
+         "logoFound" : -1,
+         "startTimestamp" : 2214560,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2254760,
+         "id" : 73,
+         "logoFound" : -1,
+         "startTimestamp" : 2234680,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2274880,
+         "id" : 74,
+         "logoFound" : -1,
+         "startTimestamp" : 2254800,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2295040,
+         "id" : 75,
+         "logoFound" : -1,
+         "startTimestamp" : 2274920,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2315200,
+         "id" : 76,
+         "logoFound" : -1,
+         "startTimestamp" : 2295080,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2335320,
+         "id" : 77,
+         "logoFound" : -1,
+         "startTimestamp" : 2315240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2350520,
+         "id" : 78,
+         "logoFound" : -1,
+         "startTimestamp" : 2335360,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2360680,
+         "id" : 79,
+         "logoFound" : -1,
+         "startTimestamp" : 2350560,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2380800,
+         "id" : 80,
+         "logoFound" : -1,
+         "startTimestamp" : 2360720,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2400920,
+         "id" : 81,
+         "logoFound" : -1,
+         "startTimestamp" : 2380840,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2421040,
+         "id" : 82,
+         "logoFound" : -1,
+         "startTimestamp" : 2400960,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2439200,
+         "id" : 83,
+         "logoFound" : -1,
+         "startTimestamp" : 2421080,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2454320,
+         "id" : 84,
+         "logoFound" : -1,
+         "startTimestamp" : 2439240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2474440,
+         "id" : 85,
+         "logoFound" : -1,
+         "startTimestamp" : 2454360,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2494560,
+         "id" : 86,
+         "logoFound" : -1,
+         "startTimestamp" : 2474480,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2504720,
+         "id" : 87,
+         "logoFound" : -1,
+         "startTimestamp" : 2494600,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2508800,
+         "id" : 88,
+         "logoFound" : -1,
+         "startTimestamp" : 2504760,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2528880,
+         "id" : 89,
+         "logoFound" : -1,
+         "startTimestamp" : 2508840,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2549000,
+         "id" : 90,
+         "logoFound" : -1,
+         "startTimestamp" : 2528920,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2569160,
+         "id" : 91,
+         "logoFound" : -1,
+         "startTimestamp" : 2549040,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2574280,
+         "id" : 92,
+         "logoFound" : -1,
+         "startTimestamp" : 2569200,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2594400,
+         "id" : 93,
+         "logoFound" : -1,
+         "startTimestamp" : 2574320,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2614520,
+         "id" : 94,
+         "logoFound" : -1,
+         "startTimestamp" : 2594440,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2645080,
+         "id" : 95,
+         "logoFound" : -1,
+         "startTimestamp" : 2614560,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2675200,
+         "id" : 96,
+         "logoFound" : -1,
+         "startTimestamp" : 2645120,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2695320,
+         "id" : 97,
+         "logoFound" : -1,
+         "startTimestamp" : 2675240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2705480,
+         "id" : 98,
+         "logoFound" : -1,
+         "startTimestamp" : 2695360,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2720600,
+         "id" : 99,
+         "logoFound" : -1,
+         "startTimestamp" : 2705520,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2740760,
+         "id" : 100,
+         "logoFound" : -1,
+         "startTimestamp" : 2720640,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2760880,
+         "id" : 101,
+         "logoFound" : -1,
+         "startTimestamp" : 2740800,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2781080,
+         "id" : 102,
+         "logoFound" : -1,
+         "startTimestamp" : 2760920,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2801160,
+         "id" : 103,
+         "logoFound" : -1,
+         "startTimestamp" : 2781120,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2814280,
+         "id" : 104,
+         "logoFound" : -1,
+         "startTimestamp" : 2801200,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2834440,
+         "id" : 105,
+         "logoFound" : -1,
+         "startTimestamp" : 2814320,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2854600,
+         "id" : 106,
+         "logoFound" : -1,
+         "startTimestamp" : 2834480,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2874760,
+         "id" : 107,
+         "logoFound" : -1,
+         "startTimestamp" : 2854640,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2894920,
+         "id" : 108,
+         "logoFound" : -1,
+         "startTimestamp" : 2874800,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2915040,
+         "id" : 109,
+         "logoFound" : -1,
+         "startTimestamp" : 2894960,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2935200,
+         "id" : 110,
+         "logoFound" : -1,
+         "startTimestamp" : 2915080,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2955360,
+         "id" : 111,
+         "logoFound" : -1,
+         "startTimestamp" : 2935240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2975480,
+         "id" : 112,
+         "logoFound" : -1,
+         "startTimestamp" : 2955400,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 2985640,
+         "id" : 113,
+         "logoFound" : -1,
+         "startTimestamp" : 2975520,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 3005800,
+         "id" : 114,
+         "logoFound" : -1,
+         "startTimestamp" : 2985680,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 3025920,
+         "id" : 115,
+         "logoFound" : -1,
+         "startTimestamp" : 3005840,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 3051080,
+         "id" : 116,
+         "logoFound" : -1,
+         "startTimestamp" : 3025960,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 3071200,
+         "id" : 117,
+         "logoFound" : -1,
+         "startTimestamp" : 3051120,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 3075280,
+         "id" : 118,
+         "logoFound" : -1,
+         "startTimestamp" : 3071240,
+         "type" : "AD"
+      },
+      {
+         "endTimestamp" : 3080360,
+         "id" : 119,
+         "logoFound" : -1,
+         "startTimestamp" : 3075320,
          "type" : "AD"
       }
    ]

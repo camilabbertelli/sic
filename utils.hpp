@@ -145,6 +145,14 @@ namespace camicasa
             @returns returns true if the pattern was found
         */
         bool findPatternLogo(Mat &input, Logo& pattern);
+
+        /**
+            @brief The function camicasa::TVChannel::updateSegment is a method for updating the segments detected times
+            @param id identifier of segment
+            @param pattern new startTimestamp
+            @param pattern new endTimestamp
+        */
+        void updateSegment(int id, int newStart, int newEnd);
     };
 
     /**

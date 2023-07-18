@@ -51,19 +51,18 @@ string \mbox{\hyperlink{namespacecamicasa_a717fe5c5935b0a585b2a5ec1712587d4}{for
 \begin{DoxyCompactList}\small\item\em The function \mbox{\hyperlink{namespacecamicasa_a717fe5c5935b0a585b2a5ec1712587d4}{camicasa\+::format\+Timestamp}} is a method converting the duration in milliseconds for human reading. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{namespacecamicasa_a19771b0976e79761646442235e6a2e30}{convert\+Binarized\+Frame}} (Mat \&frame, Mat \&output, \mbox{\hyperlink{namespacecamicasa_a9398af01158bcb053c6a1cdbb788ee9f}{Binarization\+Mode}} mode=HIGHLIGHT\+\_\+\+IN\+\_\+\+WHITE)
 \begin{DoxyCompactList}\small\item\em The functions \mbox{\hyperlink{namespacecamicasa_a19771b0976e79761646442235e6a2e30}{camicasa\+::convert\+Binarized\+Frame}} is a method for inverting ou maintaining the input image binarization considering the premise that the most abundant color is not the focus of the frame. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{namespacecamicasa_ac6ca28abd7ed726fef9cbfebcaa3d367}{crop\+Logo}} (Mat \&input\+Original, Mat \&input\+Bitwise, Mat \&output)
-\begin{DoxyCompactList}\small\item\em The functions \mbox{\hyperlink{namespacecamicasa_ac6ca28abd7ed726fef9cbfebcaa3d367}{camicasa\+::crop\+Logo}} is a method for finding the logo present and cropping the input frame. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespacecamicasa_a3b003b50be260960761f1098681eca04}{crop\+Logo}} (Mat \&input\+Original, Mat \&input\+Bitwise, \mbox{\hyperlink{structcamicasa_1_1Logo}{Logo}} \&output)
+\begin{DoxyCompactList}\small\item\em The functions \mbox{\hyperlink{namespacecamicasa_a3b003b50be260960761f1098681eca04}{camicasa\+::crop\+Logo}} is a method for finding the logo present and cropping the input frame. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{namespacecamicasa_abe6af3c69fa04b29d04c82f7367cfaba}{morph\+Operation}} (Mat \&input, Mat \&output)
 \begin{DoxyCompactList}\small\item\em The functions \mbox{\hyperlink{namespacecamicasa_abe6af3c69fa04b29d04c82f7367cfaba}{camicasa\+::morph\+Operation}} is a method for removing dots and loose pixels in the input frame utilizing the cv\+::morphology\+Ex function. \end{DoxyCompactList}\item 
 double \mbox{\hyperlink{namespacecamicasa_a6740c6a13a1521cc5b6be3c5a7b4993f}{distance\+Point\+Rectangle}} (Point point, vector$<$ Point $>$ rectangle)
 \begin{DoxyCompactList}\small\item\em The functions \mbox{\hyperlink{namespacecamicasa_a6740c6a13a1521cc5b6be3c5a7b4993f}{camicasa\+::distance\+Point\+Rectangle}} is a method for finding the smallest distance between a given point and a rectangle. \end{DoxyCompactList}\item 
-\mbox{\Hypertarget{namespacecamicasa_aa9850ece1184f51b773d9b08647d2d37}\label{namespacecamicasa_aa9850ece1184f51b773d9b08647d2d37}} 
 double \mbox{\hyperlink{namespacecamicasa_aa9850ece1184f51b773d9b08647d2d37}{distance\+Points}} (Point a, Point b)
 \begin{DoxyCompactList}\small\item\em Distance of given two points. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{namespacecamicasa_a55cd91ab29fae2b867577e04a006a891}{trim\+Elements}} (list$<$ Mat $>$ \&elements, Mat \&pattern)
-\begin{DoxyCompactList}\small\item\em The function \mbox{\hyperlink{namespacecamicasa_a55cd91ab29fae2b867577e04a006a891}{camicasa\+::trim\+Elements}} is a method for removing the frames of the segment that don\textquotesingle{}t have the given pattern present. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{namespacecamicasa_a9af83308dd0dca5a19b7046ff14ec375}{write\+Video}} (list$<$ Mat $>$ elements, Video\+Writer writer)
-\begin{DoxyCompactList}\small\item\em The function \mbox{\hyperlink{namespacecamicasa_a9af83308dd0dca5a19b7046ff14ec375}{camicasa\+::write\+Video}} is a method for writing in the disk segments of video. \end{DoxyCompactList}\end{DoxyCompactItemize}
+const char $\ast$ \mbox{\hyperlink{namespacecamicasa_a0b2e32bc3f92ce55772db5431e5b84a9}{stringify\+TVChannel\+Type}} (\mbox{\hyperlink{namespacecamicasa_a06aa4fb8f689ee41529d95389b0b301a}{TVChannel\+Type}} item)
+\begin{DoxyCompactList}\small\item\em Convert enum \mbox{\hyperlink{namespacecamicasa_a06aa4fb8f689ee41529d95389b0b301a}{camicasa\+::\+TVChannel\+Type}} into a string (char$\ast$) \end{DoxyCompactList}\item 
+const char $\ast$ \mbox{\hyperlink{namespacecamicasa_a1b583937da00b677049081fb5a767195}{stringify\+Screen\+Corner}} (\mbox{\hyperlink{namespacecamicasa_a1d32db690488b001cd266cae12e5ec7f}{Screen\+Corner}} item)
+\begin{DoxyCompactList}\small\item\em Convert enum \mbox{\hyperlink{namespacecamicasa_a1d32db690488b001cd266cae12e5ec7f}{camicasa\+::\+Screen\+Corner}} into a string (char$\ast$) \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
@@ -89,15 +88,15 @@ The functions \mbox{\hyperlink{namespacecamicasa_a19771b0976e79761646442235e6a2e
  & {\em mode} & optional mode that describes which color should the important information be (default is HIGHLIGHT\+\_\+\+IN\+\_\+\+WHITE) \\
 \hline
 \end{DoxyParams}
-\mbox{\Hypertarget{namespacecamicasa_ac6ca28abd7ed726fef9cbfebcaa3d367}\label{namespacecamicasa_ac6ca28abd7ed726fef9cbfebcaa3d367}} 
+\mbox{\Hypertarget{namespacecamicasa_a3b003b50be260960761f1098681eca04}\label{namespacecamicasa_a3b003b50be260960761f1098681eca04}} 
 \index{camicasa@{camicasa}!cropLogo@{cropLogo}}
 \index{cropLogo@{cropLogo}!camicasa@{camicasa}}
 \doxysubsubsection{\texorpdfstring{cropLogo()}{cropLogo()}}
-{\footnotesize\ttfamily void camicasa\+::crop\+Logo (\begin{DoxyParamCaption}\item[{Mat \&}]{input\+Original,  }\item[{Mat \&}]{input\+Bitwise,  }\item[{Mat \&}]{output }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily void camicasa\+::crop\+Logo (\begin{DoxyParamCaption}\item[{Mat \&}]{input\+Original,  }\item[{Mat \&}]{input\+Bitwise,  }\item[{\mbox{\hyperlink{structcamicasa_1_1Logo}{Logo}} \&}]{output }\end{DoxyParamCaption})}
 
 
 
-The functions \mbox{\hyperlink{namespacecamicasa_ac6ca28abd7ed726fef9cbfebcaa3d367}{camicasa\+::crop\+Logo}} is a method for finding the logo present and cropping the input frame. 
+The functions \mbox{\hyperlink{namespacecamicasa_a3b003b50be260960761f1098681eca04}{camicasa\+::crop\+Logo}} is a method for finding the logo present and cropping the input frame. 
 
 
 \begin{DoxyParams}[1]{Parameters}
@@ -105,7 +104,7 @@ The functions \mbox{\hyperlink{namespacecamicasa_ac6ca28abd7ed726fef9cbfebcaa3d3
 \hline
 \mbox{\texttt{ in}}  & {\em input\+Bitwise} & compared image frame with bitwise\+\_\+and operation input cv\+::\+Mat \\
 \hline
-\mbox{\texttt{ out}}  & {\em output} & image frame output cv\+::\+Mat with only the logo \\
+\mbox{\texttt{ out}}  & {\em output} & \mbox{\hyperlink{structcamicasa_1_1Logo}{camicasa\+::\+Logo}} containing image frame and other relevant information \\
 \hline
 \end{DoxyParams}
 \mbox{\Hypertarget{namespacecamicasa_a6740c6a13a1521cc5b6be3c5a7b4993f}\label{namespacecamicasa_a6740c6a13a1521cc5b6be3c5a7b4993f}} 
@@ -127,6 +126,26 @@ The functions \mbox{\hyperlink{namespacecamicasa_a6740c6a13a1521cc5b6be3c5a7b499
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
 double representing distance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacecamicasa_aa9850ece1184f51b773d9b08647d2d37}\label{namespacecamicasa_aa9850ece1184f51b773d9b08647d2d37}} 
+\index{camicasa@{camicasa}!distancePoints@{distancePoints}}
+\index{distancePoints@{distancePoints}!camicasa@{camicasa}}
+\doxysubsubsection{\texorpdfstring{distancePoints()}{distancePoints()}}
+{\footnotesize\ttfamily double camicasa\+::distance\+Points (\begin{DoxyParamCaption}\item[{Point}]{a,  }\item[{Point}]{b }\end{DoxyParamCaption})}
+
+
+
+Distance of given two points. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & cv\+::\+Point \\
+\hline
+{\em b} & cv\+::\+Point \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns the distance as a double 
 \end{DoxyReturn}
 \mbox{\Hypertarget{namespacecamicasa_a717fe5c5935b0a585b2a5ec1712587d4}\label{namespacecamicasa_a717fe5c5935b0a585b2a5ec1712587d4}} 
 \index{camicasa@{camicasa}!formatTimestamp@{formatTimestamp}}
@@ -185,37 +204,39 @@ The function \mbox{\hyperlink{namespacecamicasa_a4896d8a43a954c5b0bc7d7d0e578680
 \begin{DoxyReturn}{Returns}
 returns true if frame presented has average pixels that fall under/above the specified threshold 
 \end{DoxyReturn}
-\mbox{\Hypertarget{namespacecamicasa_a55cd91ab29fae2b867577e04a006a891}\label{namespacecamicasa_a55cd91ab29fae2b867577e04a006a891}} 
-\index{camicasa@{camicasa}!trimElements@{trimElements}}
-\index{trimElements@{trimElements}!camicasa@{camicasa}}
-\doxysubsubsection{\texorpdfstring{trimElements()}{trimElements()}}
-{\footnotesize\ttfamily void camicasa\+::trim\+Elements (\begin{DoxyParamCaption}\item[{list$<$ Mat $>$ \&}]{elements,  }\item[{Mat \&}]{pattern }\end{DoxyParamCaption})}
+\mbox{\Hypertarget{namespacecamicasa_a1b583937da00b677049081fb5a767195}\label{namespacecamicasa_a1b583937da00b677049081fb5a767195}} 
+\index{camicasa@{camicasa}!stringifyScreenCorner@{stringifyScreenCorner}}
+\index{stringifyScreenCorner@{stringifyScreenCorner}!camicasa@{camicasa}}
+\doxysubsubsection{\texorpdfstring{stringifyScreenCorner()}{stringifyScreenCorner()}}
+{\footnotesize\ttfamily const char $\ast$ camicasa\+::stringify\+Screen\+Corner (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacecamicasa_a1d32db690488b001cd266cae12e5ec7f}{Screen\+Corner}}}]{item }\end{DoxyParamCaption})}
 
 
 
-The function \mbox{\hyperlink{namespacecamicasa_a55cd91ab29fae2b867577e04a006a891}{camicasa\+::trim\+Elements}} is a method for removing the frames of the segment that don\textquotesingle{}t have the given pattern present. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em elements} & list of cv\+::\+Mat elements to analyze \\
-\hline
-{\em pattern} & cv\+::\+Mat image to search in elements list \\
-\hline
-\end{DoxyParams}
-\mbox{\Hypertarget{namespacecamicasa_a9af83308dd0dca5a19b7046ff14ec375}\label{namespacecamicasa_a9af83308dd0dca5a19b7046ff14ec375}} 
-\index{camicasa@{camicasa}!writeVideo@{writeVideo}}
-\index{writeVideo@{writeVideo}!camicasa@{camicasa}}
-\doxysubsubsection{\texorpdfstring{writeVideo()}{writeVideo()}}
-{\footnotesize\ttfamily void camicasa\+::write\+Video (\begin{DoxyParamCaption}\item[{list$<$ Mat $>$}]{elements,  }\item[{Video\+Writer}]{writer }\end{DoxyParamCaption})}
-
-
-
-The function \mbox{\hyperlink{namespacecamicasa_a9af83308dd0dca5a19b7046ff14ec375}{camicasa\+::write\+Video}} is a method for writing in the disk segments of video. 
+Convert enum \mbox{\hyperlink{namespacecamicasa_a1d32db690488b001cd266cae12e5ec7f}{camicasa\+::\+Screen\+Corner}} into a string (char$\ast$) 
 
 
 \begin{DoxyParams}{Parameters}
-{\em elements} & list of cv\+::\+Mat elements to write \\
-\hline
-{\em writer} & already configured cv\+::\+Video\+Writer to use \\
+{\em item} & \mbox{\hyperlink{namespacecamicasa_a1d32db690488b001cd266cae12e5ec7f}{camicasa\+::\+Screen\+Corner}} \\
 \hline
 \end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns a sequence of chars 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacecamicasa_a0b2e32bc3f92ce55772db5431e5b84a9}\label{namespacecamicasa_a0b2e32bc3f92ce55772db5431e5b84a9}} 
+\index{camicasa@{camicasa}!stringifyTVChannelType@{stringifyTVChannelType}}
+\index{stringifyTVChannelType@{stringifyTVChannelType}!camicasa@{camicasa}}
+\doxysubsubsection{\texorpdfstring{stringifyTVChannelType()}{stringifyTVChannelType()}}
+{\footnotesize\ttfamily const char $\ast$ camicasa\+::stringify\+TVChannel\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacecamicasa_a06aa4fb8f689ee41529d95389b0b301a}{TVChannel\+Type}}}]{item }\end{DoxyParamCaption})}
+
+
+
+Convert enum \mbox{\hyperlink{namespacecamicasa_a06aa4fb8f689ee41529d95389b0b301a}{camicasa\+::\+TVChannel\+Type}} into a string (char$\ast$) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em item} & \mbox{\hyperlink{namespacecamicasa_a06aa4fb8f689ee41529d95389b0b301a}{camicasa\+::\+TVChannel\+Type}} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns a sequence of chars 
+\end{DoxyReturn}

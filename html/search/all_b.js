@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['writevideo_25',['writeVideo',['../namespacecamicasa.html#a9af83308dd0dca5a19b7046ff14ec375',1,'camicasa']]]
+  ['_7etvchannel_28',['~TVChannel',['../classcamicasa_1_1TVChannel.html#a61abc95f2119f02c187cdc2b9745b4d2',1,'camicasa::TVChannel']]]
 ];

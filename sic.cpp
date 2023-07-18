@@ -31,8 +31,7 @@ int main(int argc, char** argv)
 
     cout << "Frame width: " << frameWidth << "\n";
     cout << "Frame height: " << frameHeight << "\n";
-    cout << "FPS: " << fps << "\n";
-
+    cout << "FPS: " << fps << "\n\n";
 
     // reset folders to store retrieved data
     system("rm -r videos");
@@ -42,7 +41,7 @@ int main(int argc, char** argv)
 
 
     // minimum time in seconds for a segment to be considered a program
-    int minimumTime = 60;
+    int minimumTime = 120;
     int timestamp = 0;
 
     TVChannel *channel = new TVChannel(frameWidth, frameHeight, fps, minimumTime);
@@ -69,10 +68,14 @@ int main(int argc, char** argv)
 
     Segment currentSegment;
 
+
+
     // json variables
     Json::Value json;
     Json::Value logoVec(Json::arrayValue);
     Json::Value segmentVec(Json::arrayValue);
+
+    puts("**** LOGO DETECTION AND SEGMENT CLASSIFICATTION ****");
 
     // first reading of all frames to detect logos and classify segments
     while (vidCapture.isOpened()){
@@ -85,6 +88,7 @@ int main(int argc, char** argv)
                 channel->addSegment(currentSegment);
                 currentSegment.id++;
                 currentSegment.type = AD;
+                currentSegment.logoAssociated = -1;
                 logoAlreadyFound = false;
             }
             break;
@@ -124,9 +128,10 @@ int main(int argc, char** argv)
             if (!logoAlreadyFound && currentSegment.type != PROGRAM)
             for (Logo logo : channel->getLogos())
                 if (channel->findPatternLogo(frame, logo)){
-                    cout << "Segment " << currentSegment.id << " changed to program because of logo\n";
+                    cout << "Segment " << currentSegment.id << " changed to program because a logo was found\n";
                     currentSegment.type = PROGRAM;
                     logoAlreadyFound = true;
+                    break;
                 }
 
             // change segment type after a certain time has passed
@@ -169,8 +174,7 @@ int main(int argc, char** argv)
                     continue;
 
                 logoAlreadyFound = true;
-
-                cout << "Found logo in " << stringifyScreenCorner(currentLogo.screenCorner) << "!\n";
+                cout << "Segment " << currentSegment.id << " found a logo at the " << stringifyScreenCorner(currentLogo.screenCorner) << "!\n";
 
                 stringstream logoWriter;
                 logoWriter << "logos/logo" << currentLogo.id << ".jpg";
@@ -189,6 +193,12 @@ int main(int argc, char** argv)
 
                 logoVec.append(logoJson);
 
+                if (currentSegment.type != PROGRAM){
+                    currentSegment.type = PROGRAM;
+                    cout << "Segment " << currentSegment.id << " changed to program because a logo was detected\n";
+                }
+
+                currentSegment.logoAssociated = currentLogo.id;
                 currentLogo.id++;
                 }
             }
@@ -220,6 +230,9 @@ int main(int argc, char** argv)
         cv::destroyAllWindows();
         return 0;
     }
+
+    puts("");
+    puts("**** SEGMENT TRIMMING ****");
 
     for (int i = 0; i < channel->getSegments().size(); i++)
     {
@@ -282,10 +295,14 @@ int main(int argc, char** argv)
         segmentJson["startTimestamp"] = segment->startTimestamp;
         segmentJson["endTimestamp"] = segment->endTimestamp;
         segmentJson["type"] = stringifyTVChannelType(segment->type);
+        segmentJson["logoFound"] = segment->logoAssociated;
 
         segmentVec.append(segmentJson);
-
-        cout << "\nStart " << stringifyTVChannelType(segment->type) << " of segment " << segment->id << " at " << formatTimestamp(segment->startTimestamp) << "\n";
+        
+        puts("");
+        cout << "Start " << stringifyTVChannelType(segment->type) << " of segment " << segment->id << " at " << formatTimestamp(segment->startTimestamp) << "\n";
+        if (segment->logoAssociated != -1)
+            cout << "Logo " << segment->logoAssociated << " was found in this segment\n";
         cout << "End of segment " << segment->id << " at " << formatTimestamp(segment->endTimestamp) << "\n";
 
         writer.release();

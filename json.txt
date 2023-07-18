@@ -13,72 +13,84 @@
       {
          "endTimestamp" : 10300,
          "id" : 1,
+         "logoFound" : -1,
          "startTimestamp" : 33,
          "type" : "AD"
       },
       {
          "endTimestamp" : 30400,
          "id" : 2,
+         "logoFound" : -1,
          "startTimestamp" : 10333,
          "type" : "AD"
       },
       {
          "endTimestamp" : 50600,
          "id" : 3,
+         "logoFound" : -1,
          "startTimestamp" : 30433,
          "type" : "AD"
       },
       {
          "endTimestamp" : 60733,
          "id" : 4,
+         "logoFound" : -1,
          "startTimestamp" : 50633,
          "type" : "AD"
       },
       {
          "endTimestamp" : 75933,
          "id" : 5,
+         "logoFound" : -1,
          "startTimestamp" : 60766,
          "type" : "AD"
       },
       {
          "endTimestamp" : 96100,
          "id" : 6,
+         "logoFound" : -1,
          "startTimestamp" : 75966,
          "type" : "AD"
       },
       {
          "endTimestamp" : 116233,
          "id" : 7,
+         "logoFound" : -1,
          "startTimestamp" : 96133,
          "type" : "AD"
       },
       {
          "endTimestamp" : 136366,
          "id" : 8,
+         "logoFound" : -1,
          "startTimestamp" : 116266,
          "type" : "AD"
       },
       {
          "endTimestamp" : 235333,
          "id" : 9,
+         "logoFound" : 1,
          "startTimestamp" : 145466,
          "type" : "PROGRAM"
       },
       {
          "endTimestamp" : 259766,
          "id" : 10,
+         "logoFound" : 1,
          "startTimestamp" : 239833,
          "type" : "AD"
       },
       {
          "endTimestamp" : 279966,
          "id" : 11,
+         "logoFound" : 1,
          "startTimestamp" : 259800,
          "type" : "AD"
       },
       {
          "endTimestamp" : 284166,
          "id" : 12,
+         "logoFound" : 1,
          "startTimestamp" : 280000,
          "type" : "AD"
       }

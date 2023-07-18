@@ -190,8 +190,8 @@ bool camicasa::TVChannel::findPatternLogo(Mat &input, Logo& pattern)
 
     //imshow("Canny input", inputEdges);
     //imshow("Canny pattern", patternEdges);
-    waitKey(0);
-    cv::destroyAllWindows();
+    //waitKey(0);
+    //cv::destroyAllWindows();
     return (screenThresholdDetection(bitwise, CHECK_BIGGER, 15));
 
     // // blur the image, so the edge detection (canny) works better
@@ -301,9 +301,7 @@ void camicasa::cropLogo(Mat &inputOriginal, Mat &inputBitwise, Logo& output)
             }
 
             if (foundStartX && value && column >= endX)
-            {
                 endX = column;
-            }
 
             if (!foundStartY && value)
             {
@@ -312,9 +310,7 @@ void camicasa::cropLogo(Mat &inputOriginal, Mat &inputBitwise, Logo& output)
             }
 
             if (foundStartY && value && row >= endY)
-            {
                 endY = row;
-            }
         }
     }
 
@@ -335,21 +331,15 @@ void camicasa::morphOperation(Mat &input, Mat &output)
 {
     // create structuring elements (more weight on dilate than erode)
     int morph_size = 2;
-    Mat element1 = getStructuringElement(
-        MORPH_RECT,
-        Size(2 * morph_size + 1,
-             2 * morph_size + 1));
-
-    morph_size = 2;
-    Mat element2 = getStructuringElement(
+    Mat element = getStructuringElement(
         MORPH_RECT,
         Size(2 * morph_size + 1,
              2 * morph_size + 1));
 
     // transformations
     Mat aux;
-    erode(input, aux, element1);
-    dilate(aux, output, element2);
+    erode(input, aux, element);
+    dilate(aux, output, element);
 }
 
 double camicasa::distancePointRectangle(Point point, vector<Point> rectangle)

@@ -28,6 +28,7 @@ namespace camicasa
         int startTimestamp = 0;
         int endTimestamp = 0;
         TVChannelType type = AD;
+        int logoAssociated = -1;
     };
 
     /// @brief struct camicasa::Logo containing information about logos found in a television program

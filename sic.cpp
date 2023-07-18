@@ -69,7 +69,6 @@ int main(int argc, char** argv)
     Segment currentSegment;
 
 
-
     // json variables
     Json::Value json;
     Json::Value logoVec(Json::arrayValue);

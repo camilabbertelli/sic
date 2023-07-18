@@ -77,12 +77,8 @@ bool camicasa::screenThresholdDetection(Mat &frame, ComparisonOperation operatio
 
     int avg = (mean(0) + mean(1) + mean(2)) / (frame.channels());
 
-    //cout << "avg " << avg << "\n";
-
     if (operation == CHECK_SMALLER)
         return (avg <= threshold);
-
-
 
     return (avg >= threshold);
 }
@@ -184,48 +180,7 @@ bool camicasa::TVChannel::findPatternLogo(Mat &input, Logo& pattern)
     Mat bitwise;
     bitwise_and(patternEdges, inputEdges, bitwise);
     
-    //imshow("Input", input);
-    //imshow("Logo", pattern.image);
-    //imshow("Cropped", cropped);
-
-    //imshow("Canny input", inputEdges);
-    //imshow("Canny pattern", patternEdges);
-    //waitKey(0);
-    //cv::destroyAllWindows();
     return (screenThresholdDetection(bitwise, CHECK_BIGGER, 15));
-
-    // // blur the image, so the edge detection (canny) works better
-    //Mat inputBlur;
-    //GaussianBlur(inputGray, inputBlur, Size(5, 5), 0);
-
-    //Mat patternBlur;
-    //GaussianBlur(patternGray, patternBlur, Size(5, 5), 0);
-
-
-    // canny edge detection
-    // Mat inputEdges;
-    // Canny(inputGray, inputEdges, 50, 60);
-
-    // Mat patternEdges;
-    // Canny(patternGray, patternEdges, 50, 100);
-
-    // template matching
-    // Mat output;
-    // matchTemplate(inputGray, patternGray, output, TM_CCOEFF_NORMED);
-
-    // waitKey(0);
-    // cv::destroyAllWindows();
-
-    
-    // double minVal;
-    // double maxVal;
-    // Point maxLoc;
-    // Point minLoc;
-    // minMaxLoc(output, &minVal, &maxVal, &minLoc, &maxLoc, Mat());
-
-    // cout << "Btw, maxVal is " << maxVal << "\n";
-
-    // return (maxVal > 0.85);
 }
 
 string camicasa::formatTimestamp(int duration)

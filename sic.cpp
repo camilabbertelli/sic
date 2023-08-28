@@ -349,7 +349,7 @@ int main(int argc, char** argv)
 
     if (!json.empty()){
         ofstream file;
-        file.open("json.txt");
+        file.open("json.json");
 
         Json::StyledWriter jsonWriter;
         file << jsonWriter.write(json);
